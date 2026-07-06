@@ -28,38 +28,38 @@ Dokumen ini adalah entry point proyek. Untuk detail lebih dalam, lihat folder [`
 
 ## ✨ Fitur Utama
 
-| Modul | Deskripsi Singkat |
-|---|---|
-| **Auth & RBAC** | Register, login, JWT (httpOnly cookie), role `customer` / `organizer` / `admin` |
-| **Event Management** | CRUD event, publish/unpublish, upload banner & attachment, kategori |
-| **Ticket Ordering** | Validasi kuota real-time, kalkulasi total otomatis, auto-expire order pending |
-| **Payment (Xendit)** | Invoice API (VA, E-Wallet, Kartu Kredit, QRIS) + Webhook callback otomatis |
-| **E-Ticket** | Generate ticket code & QR Code, download PDF, scan & check-in anti-duplikat |
-| **Dashboard & Report** | Dashboard Organizer & Admin, laporan penjualan/revenue |
-| **Notifikasi** | Email notifikasi untuk order, payment, dan event lifecycle |
-| **Security** | Rate limiting, CORS, CSRF, XSS/SQLi protection, input validation |
+| Modul                  | Deskripsi Singkat                                                               |
+| ---------------------- | ------------------------------------------------------------------------------- |
+| **Auth & RBAC**        | Register, login, JWT (httpOnly cookie), role `customer` / `organizer` / `admin` |
+| **Event Management**   | CRUD event, publish/unpublish, upload banner & attachment, kategori             |
+| **Ticket Ordering**    | Validasi kuota real-time, kalkulasi total otomatis, auto-expire order pending   |
+| **Payment (Xendit)**   | Invoice API (VA, E-Wallet, Kartu Kredit, QRIS) + Webhook callback otomatis      |
+| **E-Ticket**           | Generate ticket code & QR Code, download PDF, scan & check-in anti-duplikat     |
+| **Dashboard & Report** | Dashboard Organizer & Admin, laporan penjualan/revenue                          |
+| **Notifikasi**         | Email notifikasi untuk order, payment, dan event lifecycle                      |
+| **Security**           | Rate limiting, CORS, CSRF, XSS/SQLi protection, input validation                |
 
 Rincian lengkap ada di [`docs/prd.md`](./docs/prd.md) dan [`docs/specification.md`](./docs/specification.md).
 
 ## 🛠️ Tech Stack
 
-| Layer | Teknologi |
-|---|---|
-| Runtime | Node.js ≥ 18.x |
-| Web Framework | Express.js |
-| View Engine | EJS (dashboard & halaman publik) |
-| Database | MySQL 8.x |
-| ORM | Sequelize + sequelize-cli |
-| Payment Gateway | Xendit — Invoice API & Webhook |
-| Autentikasi | JWT (jsonwebtoken) via httpOnly cookie |
-| Validasi | express-validator / Joi |
-| Upload File | Multer |
-| QR Code | `qrcode` |
-| PDF E-Ticket | `pdfkit` / `puppeteer` |
-| Scheduler | `node-cron` (auto-expire order) |
-| Logging | Winston + `winston-daily-rotate-file` |
-| Security | Helmet, CORS, express-rate-limit, `csurf`, bcrypt |
-| Testing | Jest + Supertest |
+| Layer           | Teknologi                                         |
+| --------------- | ------------------------------------------------- |
+| Runtime         | Node.js ≥ 18.x                                    |
+| Web Framework   | Express.js                                        |
+| View Engine     | EJS (dashboard & halaman publik)                  |
+| Database        | MySQL 8.x                                         |
+| ORM             | Sequelize + sequelize-cli                         |
+| Payment Gateway | Xendit — Invoice API & Webhook                    |
+| Autentikasi     | JWT (jsonwebtoken) via httpOnly cookie            |
+| Validasi        | express-validator / Joi                           |
+| Upload File     | Multer                                            |
+| QR Code         | `qrcode`                                          |
+| PDF E-Ticket    | `pdfkit` / `puppeteer`                            |
+| Scheduler       | `node-cron` (auto-expire order)                   |
+| Logging         | Winston + `winston-daily-rotate-file`             |
+| Security        | Helmet, CORS, express-rate-limit, `csurf`, bcrypt |
+| Testing         | Jest + Supertest                                  |
 
 > Keputusan arsitektur & alasan pemilihan stack ada di [`docs/architecture.md`](./docs/architecture.md).
 
@@ -123,27 +123,27 @@ cp .env.example .env
 
 ## 🔑 Environment Variables
 
-| Variable | Contoh | Keterangan |
-|---|---|---|
-| `NODE_ENV` | `development` | `development` \| `test` \| `production` |
-| `PORT` | `3000` | Port aplikasi |
-| `APP_URL` | `http://localhost:3000` | Base URL, dipakai untuk redirect & link email |
-| `DB_HOST` | `127.0.0.1` | Host MySQL |
-| `DB_PORT` | `3306` | Port MySQL |
-| `DB_NAME` | `ems_db` | Nama database |
-| `DB_USER` | `root` | User MySQL |
-| `DB_PASSWORD` | `secret` | Password MySQL |
-| `JWT_SECRET` | `random-long-string` | Secret untuk sign JWT |
-| `JWT_EXPIRES_IN` | `1d` | Masa berlaku token |
-| `COOKIE_SECRET` | `random-long-string` | Secret untuk cookie signing |
-| `ORDER_EXPIRY_MINUTES` | `60` | Batas waktu order `pending` sebelum auto-expired |
-| `XENDIT_SECRET_KEY` | `xnd_development_...` | Secret key dari Xendit Dashboard |
-| `XENDIT_CALLBACK_TOKEN` | `random-token` | Webhook Verification Token dari Xendit Dashboard |
-| `XENDIT_SUCCESS_REDIRECT_URL` | `${APP_URL}/orders/success` | Redirect setelah bayar sukses |
-| `XENDIT_FAILURE_REDIRECT_URL` | `${APP_URL}/orders/failed` | Redirect setelah bayar gagal |
-| `MAIL_HOST` / `MAIL_PORT` / `MAIL_USERNAME` / `MAIL_PASSWORD` | — | Konfigurasi SMTP untuk notifikasi email |
-| `RATE_LIMIT_WINDOW_MS` | `900000` | Window rate limiting (ms) |
-| `RATE_LIMIT_MAX` | `100` | Maksimum request per window per IP |
+| Variable                                                      | Contoh                      | Keterangan                                       |
+| ------------------------------------------------------------- | --------------------------- | ------------------------------------------------ |
+| `NODE_ENV`                                                    | `development`               | `development` \| `test` \| `production`          |
+| `PORT`                                                        | `3000`                      | Port aplikasi                                    |
+| `APP_URL`                                                     | `http://localhost:3000`     | Base URL, dipakai untuk redirect & link email    |
+| `DB_HOST`                                                     | `127.0.0.1`                 | Host MySQL                                       |
+| `DB_PORT`                                                     | `3306`                      | Port MySQL                                       |
+| `DB_NAME`                                                     | `ems_db`                    | Nama database                                    |
+| `DB_USER`                                                     | `root`                      | User MySQL                                       |
+| `DB_PASSWORD`                                                 | `secret`                    | Password MySQL                                   |
+| `JWT_SECRET`                                                  | `random-long-string`        | Secret untuk sign JWT                            |
+| `JWT_EXPIRES_IN`                                              | `1d`                        | Masa berlaku token                               |
+| `COOKIE_SECRET`                                               | `random-long-string`        | Secret untuk cookie signing                      |
+| `ORDER_EXPIRY_MINUTES`                                        | `60`                        | Batas waktu order `pending` sebelum auto-expired |
+| `XENDIT_SECRET_KEY`                                           | `xnd_development_...`       | Secret key dari Xendit Dashboard                 |
+| `XENDIT_CALLBACK_TOKEN`                                       | `random-token`              | Webhook Verification Token dari Xendit Dashboard |
+| `XENDIT_SUCCESS_REDIRECT_URL`                                 | `${APP_URL}/orders/success` | Redirect setelah bayar sukses                    |
+| `XENDIT_FAILURE_REDIRECT_URL`                                 | `${APP_URL}/orders/failed`  | Redirect setelah bayar gagal                     |
+| `MAIL_HOST` / `MAIL_PORT` / `MAIL_USERNAME` / `MAIL_PASSWORD` | —                           | Konfigurasi SMTP untuk notifikasi email          |
+| `RATE_LIMIT_WINDOW_MS`                                        | `900000`                    | Window rate limiting (ms)                        |
+| `RATE_LIMIT_MAX`                                              | `100`                       | Maksimum request per window per IP               |
 
 Referensi lengkap & rasionalnya ada di [`docs/specification.md`](./docs/specification.md#9-environment-variables-reference).
 
@@ -177,30 +177,30 @@ Xendit membutuhkan URL publik untuk mengirim webhook. Untuk development lokal:
 ngrok http 3000
 ```
 
-Lalu daftarkan `https://<subdomain>.ngrok-free.app/api/webhooks/xendit` sebagai **Webhook URL** di Xendit Dashboard → *Settings → Webhooks*, dan salin **Verification Token** ke `XENDIT_CALLBACK_TOKEN` di `.env`.
+Lalu daftarkan `https://<subdomain>.ngrok-free.app/api/webhooks/xendit` sebagai **Webhook URL** di Xendit Dashboard → _Settings → Webhooks_, dan salin **Verification Token** ke `XENDIT_CALLBACK_TOKEN` di `.env`.
 
 ## 📖 Dokumentasi Lengkap
 
-| Dokumen | Isi |
-|---|---|
-| [`docs/architecture.md`](./docs/architecture.md) | Arsitektur sistem, diagram, folder structure, alur payment |
-| [`docs/specification.md`](./docs/specification.md) | Skema database, spesifikasi API, business rules, integrasi Xendit |
-| [`docs/prd.md`](./docs/prd.md) | Product Requirements Document — tujuan produk, user stories, ruang lingkup |
-| [`docs/roadmap.md`](./docs/roadmap.md) | Timeline & fase pengembangan dari nol hingga launch |
-| [`docs/issue.md`](./docs/issue.md) | Backlog/issue tracker lengkap dari setup sampai proyek selesai |
+| Dokumen                                            | Isi                                                                        |
+| -------------------------------------------------- | -------------------------------------------------------------------------- |
+| [`docs/architecture.md`](./docs/architecture.md)   | Arsitektur sistem, diagram, folder structure, alur payment                 |
+| [`docs/specification.md`](./docs/specification.md) | Skema database, spesifikasi API, business rules, integrasi Xendit          |
+| [`docs/prd.md`](./docs/prd.md)                     | Product Requirements Document — tujuan produk, user stories, ruang lingkup |
+| [`docs/roadmap.md`](./docs/roadmap.md)             | Timeline & fase pengembangan dari nol hingga launch                        |
+| [`docs/issue.md`](./docs/issue.md)                 | Backlog/issue tracker lengkap dari setup sampai proyek selesai             |
 
 ## 🔌 Ringkasan API
 
 Base path: `/api/v1`
 
-| Grup | Contoh Endpoint |
-|---|---|
-| Auth | `POST /auth/register`, `POST /auth/login`, `POST /auth/forgot-password` |
-| Events | `GET /events`, `GET /events/:slug`, `POST /events` |
-| Orders | `POST /orders`, `GET /orders/:id`, `PATCH /orders/:id/cancel` |
-| Payments | `GET /orders/:id/payment`, `POST /webhooks/xendit` |
-| Tickets | `GET /tickets/:id`, `POST /tickets/scan` |
-| Dashboard | `GET /organizer/dashboard`, `GET /admin/dashboard` |
+| Grup      | Contoh Endpoint                                                         |
+| --------- | ----------------------------------------------------------------------- |
+| Auth      | `POST /auth/register`, `POST /auth/login`, `POST /auth/forgot-password` |
+| Events    | `GET /events`, `GET /events/:slug`, `POST /events`                      |
+| Orders    | `POST /orders`, `GET /orders/:id`, `PATCH /orders/:id/cancel`           |
+| Payments  | `GET /orders/:id/payment`, `POST /webhooks/xendit`                      |
+| Tickets   | `GET /tickets/:id`, `POST /tickets/scan`                                |
+| Dashboard | `GET /organizer/dashboard`, `GET /admin/dashboard`                      |
 
 Spesifikasi lengkap (request/response, auth, role) ada di [`docs/specification.md`](./docs/specification.md#4-spesifikasi-api-endpoint).
 
