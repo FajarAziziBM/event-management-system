@@ -1,0 +1,38 @@
+{
+  "name": "event-management-system",
+  "version": "1.0.0",
+  "description": "Backend API untuk platform manajemen event & ticketing online. Mendukung pembuatan event oleh organizer, penjualan tiket ke customer, serta pembayaran otomatis melalui **Xendit** (Virtual Account, E-Wallet, Kartu Kredit, QRIS) dengan sinkronisasi status pembayaran secara real-time via **Webhook**.",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/FajarAziziBM/event-management-system.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/FajarAziziBM/event-management-system/issues"
+  },
+  "homepage": "https://github.com/FajarAziziBM/event-management-system#readme",
+  "dependencies": {
+    "dotenv": "^17.4.2",
+    "ejs": "^6.0.1",
+    "express": "^5.2.1",
+    "mysql2": "^3.22.5",
+    "sequelize": "^6.37.8"
+  },
+  "devDependencies": {
+    "eslint": "^10.6.0",
+    "jest": "^30.4.2",
+    "nodemon": "^3.1.14",
+    "prettier": "^3.9.4",
+    "supertest": "^7.2.2"
+  }
+}
