@@ -181,24 +181,24 @@ Checklist: `[ ]` belum dikerjakan · `[x]` selesai.
 
 ## Ringkasan Progress
 
-| Epic | Jumlah Issue | Status |
-|---|---|---|
-| SETUP | 9 | ⬜ Belum dimulai |
-| DB | 11 | ⬜ Belum dimulai |
-| AUTH | 10 | ⬜ Belum dimulai |
-| CAT | 5 | ⬜ Belum dimulai |
-| EVT | 12 | ⬜ Belum dimulai |
-| ORD | 8 | ⬜ Belum dimulai |
-| PAY | 11 | ⬜ Belum dimulai |
-| TIX | 7 | ⬜ Belum dimulai |
-| DASH | 8 | ⬜ Belum dimulai |
-| USR | 6 | ⬜ Belum dimulai |
-| NOTIF | 5 | ⬜ Belum dimulai |
-| SEARCH | 2 | ⬜ Belum dimulai |
-| SEC | 9 | ⬜ Belum dimulai |
-| TEST | 6 | ⬜ Belum dimulai |
-| CICD | 8 | ⬜ Belum dimulai |
-| DOC | 4 | ⬜ Belum dimulai |
-| **Total** | **121** | — |
+| Epic      | Jumlah Issue | Status           |
+| --------- | ------------ | ---------------- |
+| SETUP     | 9            | ⬜ Belum dimulai |
+| DB        | 11           | ⬜ Belum dimulai |
+| AUTH      | 10           | ⬜ Belum dimulai |
+| CAT       | 5            | ⬜ Belum dimulai |
+| EVT       | 12           | ⬜ Belum dimulai |
+| ORD       | 8            | ⬜ Belum dimulai |
+| PAY       | 11           | ⬜ Belum dimulai |
+| TIX       | 7            | ⬜ Belum dimulai |
+| DASH      | 8            | ⬜ Belum dimulai |
+| USR       | 6            | ⬜ Belum dimulai |
+| NOTIF     | 5            | ⬜ Belum dimulai |
+| SEARCH    | 2            | ⬜ Belum dimulai |
+| SEC       | 9            | ⬜ Belum dimulai |
+| TEST      | 6            | ⬜ Belum dimulai |
+| CICD      | 8            | ⬜ Belum dimulai |
+| DOC       | 4            | ⬜ Belum dimulai |
+| **Total** | **121**      | —                |
 
 > Update kolom **Status** (`⬜ Belum dimulai` / `🟨 Dikerjakan` / `✅ Selesai`) seiring progres tim. Proyek dianggap **selesai** ketika seluruh 121 issue pada dokumen ini bercentang `[x]`.
