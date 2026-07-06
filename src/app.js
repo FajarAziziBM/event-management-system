@@ -1,11 +1,11 @@
 const express = require('express');
+const env = require('./config/env');
+
 const app = express();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-module.exports = app;
+console.log(`App running in ${env.app.nodeEnv} mode`);
 
-app.get('/', (req, res) => {
-    res.send('Hello World!');
-});
+module.exports = app;
