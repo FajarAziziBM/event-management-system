@@ -61,17 +61,17 @@ flowchart TB
 
 ## 4. Lapisan Aplikasi (Component Breakdown)
 
-| Layer | Tanggung Jawab |
-|---|---|
-| **Routes** | Mendefinisikan endpoint & memetakan ke controller; memisahkan `web/` (EJS) dan `api/v1/` (JSON) |
-| **Middlewares** | Autentikasi (JWT), otorisasi (role), validasi input, rate limiting, error handling, upload file |
+| Layer           | Tanggung Jawab                                                                                            |
+| --------------- | --------------------------------------------------------------------------------------------------------- |
+| **Routes**      | Mendefinisikan endpoint & memetakan ke controller; memisahkan `web/` (EJS) dan `api/v1/` (JSON)           |
+| **Middlewares** | Autentikasi (JWT), otorisasi (role), validasi input, rate limiting, error handling, upload file           |
 | **Controllers** | Menerima request, memanggil service, mengembalikan response (`render` atau `json`) — tanpa business logic |
-| **Services** | Business logic murni: validasi kuota, kalkulasi harga, integrasi Xendit, generate ticket/QR, dsb. |
-| **Models** | Definisi tabel & relasi Sequelize, termasuk validasi tingkat model |
-| **Validations** | Schema validasi input per entity (dipisah dari controller agar reusable) |
-| **Jobs** | Cron/scheduled task (expire order pending, reminder event) |
-| **Views (EJS)** | Presentasi HTML untuk web interface & dashboard |
-| **Utils** | Helper lintas modul: response envelope, generator kode order/tiket, QR, logger instance |
+| **Services**    | Business logic murni: validasi kuota, kalkulasi harga, integrasi Xendit, generate ticket/QR, dsb.         |
+| **Models**      | Definisi tabel & relasi Sequelize, termasuk validasi tingkat model                                        |
+| **Validations** | Schema validasi input per entity (dipisah dari controller agar reusable)                                  |
+| **Jobs**        | Cron/scheduled task (expire order pending, reminder event)                                                |
+| **Views (EJS)** | Presentasi HTML untuk web interface & dashboard                                                           |
+| **Utils**       | Helper lintas modul: response envelope, generator kode order/tiket, QR, logger instance                   |
 
 ## 5. Struktur Folder
 
@@ -189,18 +189,18 @@ Detail kolom & tipe data ada di [`specification.md`](./specification.md#2-skema-
 
 ### 7.2 Strategi Indexing
 
-| Tabel | Kolom | Tipe Index | Alasan |
-|---|---|---|---|
-| `users` | `email` | UNIQUE | Login & pencegahan duplikat akun |
-| `events` | `slug` | UNIQUE | Lookup detail event via URL publik |
-| `events` | `creator_id`, `category_id` | INDEX (FK) | Filter "event milik organizer X" / "per kategori" |
-| `events` | `status`, `event_date` | COMPOSITE INDEX | Query "event published & akan datang" (dipakai di halaman browse) |
-| `orders` | `order_number` | UNIQUE | Lookup order & rekonsiliasi pembayaran |
-| `orders` | `user_id`, `event_id` | INDEX (FK) | Riwayat order per user / per event |
-| `payments` | `order_id` | UNIQUE (FK) | Relasi 1:1 dengan order |
-| `payments` | `external_id`, `invoice_id` | INDEX | Pencarian saat webhook masuk |
-| `tickets` | `ticket_code` | UNIQUE | Validasi saat scan/check-in |
-| `tickets` | `order_id`, `event_id` | INDEX (FK) | Rekap tiket per order / per event |
+| Tabel      | Kolom                       | Tipe Index      | Alasan                                                            |
+| ---------- | --------------------------- | --------------- | ----------------------------------------------------------------- |
+| `users`    | `email`                     | UNIQUE          | Login & pencegahan duplikat akun                                  |
+| `events`   | `slug`                      | UNIQUE          | Lookup detail event via URL publik                                |
+| `events`   | `creator_id`, `category_id` | INDEX (FK)      | Filter "event milik organizer X" / "per kategori"                 |
+| `events`   | `status`, `event_date`      | COMPOSITE INDEX | Query "event published & akan datang" (dipakai di halaman browse) |
+| `orders`   | `order_number`              | UNIQUE          | Lookup order & rekonsiliasi pembayaran                            |
+| `orders`   | `user_id`, `event_id`       | INDEX (FK)      | Riwayat order per user / per event                                |
+| `payments` | `order_id`                  | UNIQUE (FK)     | Relasi 1:1 dengan order                                           |
+| `payments` | `external_id`, `invoice_id` | INDEX           | Pencarian saat webhook masuk                                      |
+| `tickets`  | `ticket_code`               | UNIQUE          | Validasi saat scan/check-in                                       |
+| `tickets`  | `order_id`, `event_id`      | INDEX (FK)      | Rekap tiket per order / per event                                 |
 
 ### 7.3 Normalisasi
 
@@ -234,13 +234,13 @@ sequenceDiagram
 
 ### Matriks Otorisasi (ringkas)
 
-| Aksi | Customer | Organizer | Admin |
-|---|:---:|:---:|:---:|
-| Browse/lihat event | ✅ | ✅ | ✅ |
-| Buat & kelola event | ❌ | ✅ (milik sendiri) | ✅ (semua) |
-| Order & bayar tiket | ✅ | ❌ | ❌ |
-| Validasi/check-in tiket | ❌ | ✅ (event miliknya) | ✅ |
-| Kelola kategori & user | ❌ | ❌ | ✅ |
+| Aksi                    | Customer |      Organizer      |   Admin    |
+| ----------------------- | :------: | :-----------------: | :--------: |
+| Browse/lihat event      |    ✅    |         ✅          |     ✅     |
+| Buat & kelola event     |    ❌    | ✅ (milik sendiri)  | ✅ (semua) |
+| Order & bayar tiket     |    ✅    |         ❌          |     ❌     |
+| Validasi/check-in tiket |    ❌    | ✅ (event miliknya) |     ✅     |
+| Kelola kategori & user  |    ❌    |         ❌          |     ✅     |
 
 Matriks lengkap ada di [`specification.md`](./specification.md) & dokumen fitur asli proyek.
 
@@ -285,10 +285,10 @@ Poin arsitektural penting:
 
 ## 10. Background Jobs / Scheduler
 
-| Job | Jadwal | Fungsi |
-|---|---|---|
-| `expireOrders.job.js` | Setiap 5 menit (`node-cron`) | Cari order `pending` yang melewati `ORDER_EXPIRY_MINUTES`, ubah status jadi `expired`, kembalikan `available_ticket` |
-| `eventReminder.job.js` *(opsional)* | Harian | Kirim reminder email H-1 event ke pemegang tiket |
+| Job                                 | Jadwal                       | Fungsi                                                                                                               |
+| ----------------------------------- | ---------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| `expireOrders.job.js`               | Setiap 5 menit (`node-cron`) | Cari order `pending` yang melewati `ORDER_EXPIRY_MINUTES`, ubah status jadi `expired`, kembalikan `available_ticket` |
+| `eventReminder.job.js` _(opsional)_ | Harian                       | Kirim reminder email H-1 event ke pemegang tiket                                                                     |
 
 ## 11. Strategi Error Handling
 
@@ -305,17 +305,17 @@ Poin arsitektural penting:
 
 ## 13. Arsitektur Keamanan
 
-| Aspek | Mitigasi |
-|---|---|
-| HTTP Headers | `helmet` (CSP, HSTS, dsb.) |
-| CORS | Whitelist origin via `cors` middleware |
+| Aspek         | Mitigasi                                                                                                        |
+| ------------- | --------------------------------------------------------------------------------------------------------------- |
+| HTTP Headers  | `helmet` (CSP, HSTS, dsb.)                                                                                      |
+| CORS          | Whitelist origin via `cors` middleware                                                                          |
 | Rate Limiting | `express-rate-limit`, threshold lebih ketat pada `/auth/login`, `/auth/forgot-password`, `/api/webhooks/xendit` |
-| CSRF | Token CSRF (`csurf`/double-submit cookie) pada form yang dirender EJS |
-| XSS | Auto-escaping EJS (`<%= %>`), Content-Security-Policy via helmet |
-| SQL Injection | Seluruh akses data lewat Sequelize (parameterized query), tidak ada raw query dari input user |
-| Password | Hashing dengan `bcrypt` (salt round ≥ 10) |
-| Secrets | Seluruh key/token via environment variable, tidak pernah di-commit ke repository |
-| Webhook | Verifikasi `x-callback-token`, disarankan IP whitelisting dari Xendit untuk lapisan tambahan |
+| CSRF          | Token CSRF (`csurf`/double-submit cookie) pada form yang dirender EJS                                           |
+| XSS           | Auto-escaping EJS (`<%= %>`), Content-Security-Policy via helmet                                                |
+| SQL Injection | Seluruh akses data lewat Sequelize (parameterized query), tidak ada raw query dari input user                   |
+| Password      | Hashing dengan `bcrypt` (salt round ≥ 10)                                                                       |
+| Secrets       | Seluruh key/token via environment variable, tidak pernah di-commit ke repository                                |
+| Webhook       | Verifikasi `x-callback-token`, disarankan IP whitelisting dari Xendit untuk lapisan tambahan                    |
 
 ## 14. Skalabilitas & Performa
 

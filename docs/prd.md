@@ -25,11 +25,11 @@ EMS menjawab masalah ini dengan alur pemesanan-pembayaran-tiket yang terotomasi 
 
 ## 4. Target Pengguna
 
-| Persona | Deskripsi |
-|---|---|
-| **Customer** | Individu yang ingin membeli tiket event (konser, workshop, seminar, dll). Butuh alur beli-bayar-dapat tiket yang cepat & jelas statusnya. |
+| Persona       | Deskripsi                                                                                                                                  |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Customer**  | Individu yang ingin membeli tiket event (konser, workshop, seminar, dll). Butuh alur beli-bayar-dapat tiket yang cepat & jelas statusnya.  |
 | **Organizer** | Penyelenggara event (individu/komunitas/perusahaan). Butuh kontrol penuh atas event miliknya: konten, kuota, harga, dan laporan penjualan. |
-| **Admin** | Pengelola platform. Butuh visibilitas & kontrol penuh atas seluruh user, event, order, dan pembayaran di sistem. |
+| **Admin**     | Pengelola platform. Butuh visibilitas & kontrol penuh atas seluruh user, event, order, dan pembayaran di sistem.                           |
 
 ## 5. User Stories
 
@@ -65,22 +65,22 @@ EMS menjawab masalah ini dengan alur pemesanan-pembayaran-tiket yang terotomasi 
 
 Ringkasan per modul (detail teknis di [`specification.md`](./specification.md)):
 
-| # | Modul | Ringkasan Requirement |
-|---|---|---|
-| 1 | Authentication | Register, login, logout, forgot/reset password, update profil, ganti password |
-| 2 | Event Management | CRUD event, publish/unpublish, upload banner & lampiran, statistik per event |
-| 3 | Category Management | CRUD kategori (admin) |
-| 4 | Ticket Ordering | Buat order, validasi kuota, kalkulasi total, generate nomor order, riwayat & pembatalan order |
-| 5 | Payment | Pilih metode bayar via Xendit, cek status, webhook otomatis update status |
-| 6 | Ticket Management | Generate ticket code & QR, lihat/unduh tiket, scan & check-in, cegah duplikat check-in |
-| 7 | Order Management | Riwayat order (customer), order per event (organizer), kelola seluruh order (admin) |
-| 8 | User Management | CRUD user, ubah role, suspend (admin) |
-| 9 | Dashboard | Dashboard Organizer & Admin |
-| 10 | Reports | Laporan penjualan/revenue/performa event (organizer), laporan platform (admin) |
-| 11 | Search & Filter | Pencarian event (customer), order/tiket (organizer), data platform (admin) |
-| 12 | Notifications | Email untuk lifecycle order/payment/event |
-| 13 | File Management | Upload/hapus banner & lampiran event |
-| 14 | Security | RBAC, hashing password, CSRF/XSS/SQLi protection, rate limiting |
+| #   | Modul               | Ringkasan Requirement                                                                         |
+| --- | ------------------- | --------------------------------------------------------------------------------------------- |
+| 1   | Authentication      | Register, login, logout, forgot/reset password, update profil, ganti password                 |
+| 2   | Event Management    | CRUD event, publish/unpublish, upload banner & lampiran, statistik per event                  |
+| 3   | Category Management | CRUD kategori (admin)                                                                         |
+| 4   | Ticket Ordering     | Buat order, validasi kuota, kalkulasi total, generate nomor order, riwayat & pembatalan order |
+| 5   | Payment             | Pilih metode bayar via Xendit, cek status, webhook otomatis update status                     |
+| 6   | Ticket Management   | Generate ticket code & QR, lihat/unduh tiket, scan & check-in, cegah duplikat check-in        |
+| 7   | Order Management    | Riwayat order (customer), order per event (organizer), kelola seluruh order (admin)           |
+| 8   | User Management     | CRUD user, ubah role, suspend (admin)                                                         |
+| 9   | Dashboard           | Dashboard Organizer & Admin                                                                   |
+| 10  | Reports             | Laporan penjualan/revenue/performa event (organizer), laporan platform (admin)                |
+| 11  | Search & Filter     | Pencarian event (customer), order/tiket (organizer), data platform (admin)                    |
+| 12  | Notifications       | Email untuk lifecycle order/payment/event                                                     |
+| 13  | File Management     | Upload/hapus banner & lampiran event                                                          |
+| 14  | Security            | RBAC, hashing password, CSRF/XSS/SQLi protection, rate limiting                               |
 
 ## 7. Non-Functional Requirements
 
@@ -116,20 +116,20 @@ Seluruh modul pada tabel Functional Requirements di atas.
 
 ## 10. Kriteria Keberhasilan (Success Metrics)
 
-| Metrik | Target Indikatif |
-|---|---|
-| Tingkat keberhasilan checkout (order → paid) | Dipantau per minggu, dibandingkan dengan order `expired`/`cancelled` |
-| Waktu dari `payment PAID` (webhook) hingga tiket tersedia | < 5 detik |
-| Tingkat keberhasilan pemrosesan webhook | 100% idempotent, tanpa tiket dobel meski ada retry |
-| Kegagalan check-in akibat duplikat | 0 (dicegah oleh sistem) |
-| Uptime API | ≥ 99.5% |
+| Metrik                                                    | Target Indikatif                                                     |
+| --------------------------------------------------------- | -------------------------------------------------------------------- |
+| Tingkat keberhasilan checkout (order → paid)              | Dipantau per minggu, dibandingkan dengan order `expired`/`cancelled` |
+| Waktu dari `payment PAID` (webhook) hingga tiket tersedia | < 5 detik                                                            |
+| Tingkat keberhasilan pemrosesan webhook                   | 100% idempotent, tanpa tiket dobel meski ada retry                   |
+| Kegagalan check-in akibat duplikat                        | 0 (dicegah oleh sistem)                                              |
+| Uptime API                                                | ≥ 99.5%                                                              |
 
 ## 11. Risiko & Mitigasi
 
-| Risiko | Mitigasi |
-|---|---|
-| Race condition kuota tiket saat traffic tinggi | Transaction + row locking pada pengurangan `available_ticket` |
+| Risiko                                           | Mitigasi                                                                                |
+| ------------------------------------------------ | --------------------------------------------------------------------------------------- |
+| Race condition kuota tiket saat traffic tinggi   | Transaction + row locking pada pengurangan `available_ticket`                           |
 | Webhook Xendit terlambat/duplikat/gagal terkirim | Idempotency check, endpoint webhook merespons cepat, memanfaatkan retry otomatis Xendit |
-| Downtime payment gateway | Order tetap `pending` hingga expired; komunikasikan status jelas ke customer |
-| Penyalahgunaan endpoint webhook oleh pihak luar | Verifikasi `x-callback-token`, disarankan IP whitelisting |
-| Kebocoran secret/API key | Seluruh kredensial via environment variable, tidak pernah masuk repository |
+| Downtime payment gateway                         | Order tetap `pending` hingga expired; komunikasikan status jelas ke customer            |
+| Penyalahgunaan endpoint webhook oleh pihak luar  | Verifikasi `x-callback-token`, disarankan IP whitelisting                               |
+| Kebocoran secret/API key                         | Seluruh kredensial via environment variable, tidak pernah masuk repository              |
