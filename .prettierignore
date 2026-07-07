@@ -1,7 +1,7 @@
-node_modules
-coverage
-dist
-logs
-public/uploads
-
+node_modules/
+coverage/
+dist/
+build/
 package-lock.json
+src/public/uploads/
+.husky/_
