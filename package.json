@@ -28,13 +28,18 @@
   },
   "homepage": "https://github.com/FajarAziziBM/event-management-system#readme",
   "dependencies": {
+    "bcryptjs": "^3.0.3",
     "dotenv": "^17.4.2",
     "ejs": "^6.0.1",
     "express": "^5.2.1",
+    "express-session": "^1.19.0",
+    "express-validator": "^7.3.2",
+    "multer": "^2.2.0",
     "mysql2": "^3.22.5",
     "sequelize": "^6.37.8",
     "winston": "^3.19.0",
-    "winston-daily-rotate-file": "^5.0.0"
+    "winston-daily-rotate-file": "^5.0.0",
+    "xendit-node": "^7.0.0"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
