@@ -1,65 +1,48 @@
+'use strict';
+
+const { defineConfig, globalIgnores } = require('eslint/config');
 const js = require('@eslint/js');
 const globals = require('globals');
+const eslintConfigPrettier = require('eslint-config-prettier/flat');
 
-module.exports = [
-  {
-    ignores: ['node_modules/**', 'coverage/**', 'public/uploads/**', 'logs/**', 'dist/**'],
-  },
+module.exports = defineConfig([
+  // Global ignores — diterapkan ke seluruh config di bawahnya
+  globalIgnores(['coverage/**', 'dist/**', 'build/**']),
 
+  // Rule dasar bawaan ESLint
   js.configs.recommended,
 
+  // Konfigurasi utama: seluruh source code Node.js (CommonJS)
   {
-    files: ['**/*.js'],
-
+    files: ['**/*.js', '**/*.cjs'],
     languageOptions: {
       ecmaVersion: 'latest',
       sourceType: 'commonjs',
+      globals: {
+        ...globals.node,
+      },
+    },
+    rules: {
+      'no-unused-vars': ['warn', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
+      // Dorong pemakaian logger (winston) alih-alih console.log langsung
+      'no-console': 'warn',
+      eqeqeq: ['error', 'always'],
+      'no-var': 'error',
+      'prefer-const': 'warn',
+    },
+  },
 
+  // Override khusus file test (Jest)
+  {
+    files: ['tests/**/*.js', '**/*.test.js', '**/*.spec.js'],
+    languageOptions: {
       globals: {
         ...globals.node,
         ...globals.jest,
       },
     },
-
-    rules: {
-      // Possible Problems
-      'no-unused-vars': [
-        'warn',
-        {
-          argsIgnorePattern: '^_',
-          varsIgnorePattern: '^_',
-        },
-      ],
-
-      'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
-
-      'no-debugger': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
-
-      eqeqeq: ['error', 'always'],
-
-      curly: ['error', 'all'],
-
-      semi: ['error', 'always'],
-
-      quotes: ['error', 'single'],
-
-      indent: ['error', 2],
-
-      'comma-dangle': ['error', 'always-multiline'],
-
-      'object-curly-spacing': ['error', 'always'],
-
-      'array-bracket-spacing': ['error', 'never'],
-
-      'arrow-spacing': ['error'],
-
-      'keyword-spacing': ['error'],
-
-      'space-before-blocks': ['error'],
-
-      'space-infix-ops': ['error'],
-
-      'eol-last': ['error', 'always'],
-    },
   },
-];
+
+  // Matikan rule ESLint yang bentrok dengan Prettier — HARUS di posisi paling akhir
+  eslintConfigPrettier,
+]);
