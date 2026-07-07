@@ -1,9 +1,12 @@
 // src/server.js
 
-const app = require("./app");
-const logger = require("./config/logger");
+'use strict';
 
-const PORT = process.env.PORT || 3000;
+const app = require('./app');
+const logger = require('./config/logger');
+const config = require('./config/env');
+
+const PORT = config.app.port;
 
 app.listen(PORT, () => {
   logger.info(`Server running on port ${PORT}`);
