@@ -10,3 +10,4 @@ module.exports = {
   ValidationError: require('./ValidationError'),
   PaymentError: require('./PaymentError'),
 };
+
