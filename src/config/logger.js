@@ -1,10 +1,5 @@
 // src/config/logger.js
 
-const fs = require("fs");
-const path = require("path");
-const winston = require("winston");
-require("winston-daily-rotate-file");
-
 'use strict';
 
 const path = require('node:path');
