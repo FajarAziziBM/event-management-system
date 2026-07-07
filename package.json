@@ -1,53 +1,86 @@
 {
   "name": "event-management-system",
   "version": "1.0.0",
-  "description": "Backend API untuk platform manajemen event & ticketing online. Mendukung pembuatan event oleh organizer, penjualan tiket ke customer, serta pembayaran otomatis melalui **Xendit** (Virtual Account, E-Wallet, Kartu Kredit, QRIS) dengan sinkronisasi status pembayaran secara real-time via **Webhook**.",
-  "main": "index.js",
-  "directories": {
-    "doc": "docs"
+  "private": true,
+  "description": "Backend API manajemen event & ticketing dengan integrasi payment gateway Xendit (Virtual Account, E-Wallet, Kartu Kredit, QRIS) dan webhook real-time.",
+  "main": "src/server.js",
+  "type": "commonjs",
+  "engines": {
+    "node": ">=22.13.0",
+    "npm": ">=10.0.0"
   },
   "scripts": {
     "start": "node src/server.js",
     "dev": "nodemon src/server.js",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "format": "prettier . --write",
-    "format:check": "prettier . --check",
-    "test": "jest"
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "db:create": "sequelize-cli db:create",
+    "db:drop": "sequelize-cli db:drop",
+    "db:migrate": "sequelize-cli db:migrate",
+    "db:migrate:undo": "sequelize-cli db:migrate:undo",
+    "db:migrate:undo:all": "sequelize-cli db:migrate:undo:all",
+    "db:seed": "sequelize-cli db:seed:all",
+    "db:seed:undo": "sequelize-cli db:seed:undo:all",
+    "prepare": "husky"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/FajarAziziBM/event-management-system.git"
-  },
-  "keywords": [],
+  "keywords": [
+    "event-management",
+    "ticketing",
+    "express",
+    "sequelize",
+    "mysql",
+    "xendit",
+    "payment-gateway",
+    "webhook"
+  ],
   "author": "",
-  "license": "ISC",
-  "type": "commonjs",
-  "bugs": {
-    "url": "https://github.com/FajarAziziBM/event-management-system/issues"
-  },
-  "homepage": "https://github.com/FajarAziziBM/event-management-system#readme",
+  "license": "MIT",
   "dependencies": {
-    "bcryptjs": "^3.0.3",
-    "dotenv": "^17.4.2",
-    "ejs": "^6.0.1",
     "express": "^5.2.1",
-    "express-session": "^1.19.0",
-    "express-validator": "^7.3.2",
-    "multer": "^2.2.0",
+    "ejs": "^6.0.1",
+    "express-ejs-layouts": "^2.5.1",
     "mysql2": "^3.22.5",
     "sequelize": "^6.37.8",
+    "jsonwebtoken": "^9.0.3",
+    "bcrypt": "^6.0.0",
+    "cookie-parser": "^1.4.7",
+    "express-validator": "^7.3.2",
+    "multer": "^2.2.0",
+    "qrcode": "^1.5.4",
+    "pdfkit": "^0.19.1",
+    "xendit-node": "^7.0.0",
+    "node-cron": "^4.6.0",
     "winston": "^3.19.0",
     "winston-daily-rotate-file": "^5.0.0",
-    "xendit-node": "^7.0.0"
+    "morgan": "^1.11.0",
+    "helmet": "^8.2.0",
+    "cors": "^2.8.6",
+    "express-rate-limit": "^8.5.2",
+    "csrf-csrf": "^4.0.3",
+    "nodemailer": "^9.0.3",
+    "dotenv": "^17.4.2"
   },
   "devDependencies": {
-    "@eslint/js": "^10.0.1",
-    "eslint": "^10.6.0",
-    "globals": "^17.7.0",
+    "sequelize-cli": "^6.6.5",
     "jest": "^30.4.2",
+    "supertest": "^7.2.2",
     "nodemon": "^3.1.14",
+    "eslint": "^10.6.0",
+    "eslint-config-prettier": "^10.1.8",
+    "globals": "^17.7.0",
     "prettier": "^3.9.4",
-    "supertest": "^7.2.2"
+    "husky": "^9.1.7",
+    "lint-staged": "^17.0.8"
+  },
+  "lint-staged": {
+    "*.js": [
+      "eslint --fix",
+      "prettier --write"
+    ]
   }
 }
