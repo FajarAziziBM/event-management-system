@@ -1,53 +1,18 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title><%= typeof title !== 'undefined' ? title + ' · Event Management System' : 'Event Management System' %></title>
+    <link rel="stylesheet" href="/css/style.css" />
+  </head>
+  <body>
+    <%- include('../partials/navbar') %>
 
-<head>
+    <main class="container">
+      <%- include('../partials/flash') %> <%- body %>
+    </main>
 
-<meta charset="UTF-8">
-
-<meta name="viewport"
-content="width=device-width, initial-scale=1.0">
-
-
-<title>
-
-<%= title || "Event Management System" %>
-
-</title>
-
-
-<link rel="stylesheet"
-href="/css/app.css">
-
-
-</head>
-
-
-<body>
-
-
-<%- include("../partials/navbar") %>
-
-
-<main>
-
-<%- include('../partials/flash-message') %>
-
-
-<%- body %>
-
-
-</main>
-
-
-
-<%- include("../partials/footer") %>
-
-
-
-<script src="/js/app.js"></script>
-
-
-</body>
-
+    <%- include('../partials/footer') %>
+  </body>
 </html>

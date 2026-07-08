@@ -1,7 +1,20 @@
-<nav>
-  <a href="/"> Home </a>
-
-  <a href="/events"> Events </a>
-
-  <a href="/login"> Login </a>
-</nav>
+<header class="navbar">
+  <div class="navbar__brand">
+    <a href="/">🎫 Event Management System</a>
+  </div>
+  <nav class="navbar__menu">
+    <a href="/events">Event</a>
+    <% if (typeof user !=='undefined' && user) { %> <% if (user.role==='organizer' ) { %>
+    <a href="/organizer/dashboard">Dashboard Organizer</a>
+    <% } else if (user.role==='admin' ) { %>
+    <a href="/admin/dashboard">Dashboard Admin</a>
+    <% } else { %>
+    <a href="/orders">Pesanan Saya</a>
+    <% } %>
+    <a href="/auth/logout">Logout</a>
+    <% } else { %>
+    <a href="/auth/login">Masuk</a>
+    <a href="/auth/register">Daftar</a>
+    <% } %>
+  </nav>
+</header>

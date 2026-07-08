@@ -1,5 +1,3 @@
-// src/config/logger.js
-
 'use strict';
 
 const path = require('node:path');
@@ -20,7 +18,7 @@ const consoleFormat = combine(
   printf(({ timestamp: ts, level, message, stack, ...meta }) => {
     const metaStr = Object.keys(meta).length ? ` ${JSON.stringify(meta)}` : '';
     return `[${ts}] ${level}: ${stack || message}${metaStr}`;
-  })
+  }),
 );
 
 // Format untuk file (production) — JSON terstruktur, gampang di-ingest log tool lain
