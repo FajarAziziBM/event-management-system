@@ -1,5 +1,3 @@
-// src/config/env.js
-
 'use strict';
 
 const path = require('node:path');
@@ -17,7 +15,7 @@ function required(name) {
 
   if (isMissing && process.env.NODE_ENV !== 'test') {
     throw new Error(
-      `Missing required environment variable: ${name}. Sudah copy .env.example ke .env?`
+      `Missing required environment variable: ${name}. Sudah copy .env.example ke .env?`,
     );
   }
 

@@ -1,5 +1,3 @@
-// src/middlewares/error.middleware.js
-
 'use strict';
 
 const logger = require('../config/logger');
