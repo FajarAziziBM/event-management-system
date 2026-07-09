@@ -52,6 +52,26 @@ class AuthController {
       next(error);
     }
   }
+
+  static async logout(req, res, next) {
+    try {
+      res.clearCookie('token', {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+      });
+
+      return res.status(200).json(
+        ApiResponse.success(
+          'Logout successful',
+          null
+        )
+      );
+
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 module.exports = AuthController;
