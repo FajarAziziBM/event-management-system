@@ -1,3 +1,5 @@
+// seeders/20260708130600-demo-payments.js
+
 'use strict';
 
 /** @type {import('sequelize-cli').Migration} */

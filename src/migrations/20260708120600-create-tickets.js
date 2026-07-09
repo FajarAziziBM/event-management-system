@@ -1,3 +1,5 @@
+// migrations/20260708120600-create-tickets.js
+
 'use strict';
 
 /** @type {import('sequelize-cli').Migration} */

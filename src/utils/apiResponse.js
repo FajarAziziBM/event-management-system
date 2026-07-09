@@ -1,4 +1,4 @@
-// src/utils/ApiResponse.js
+// src/utils/apiResponse.js
 
 'use strict';
 

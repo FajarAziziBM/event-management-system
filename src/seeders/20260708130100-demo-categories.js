@@ -1,3 +1,5 @@
+// seeders/20260708130100-demo-categories.js
+
 'use strict';
 
 /** @type {import('sequelize-cli').Migration} */

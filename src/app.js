@@ -15,6 +15,9 @@ const { flashMiddleware } = require('./utils/flash');
 const routes = require('./routes');
 const { notFoundHandler, errorHandler } = require('./middlewares/error.middleware');
 
+const apiRoutes = require('./routes/api/v1');
+
+
 const app = express();
 
 // --- View engine (SETUP-09) ---
@@ -41,6 +44,8 @@ app.use(flashMiddleware);
 
 // --- Routes ---
 app.use(routes);
+
+app.use('/api/v1', apiRoutes);
 
 // --- 404 & global error handler (SETUP-07) — HARUS paling akhir ---
 app.use(notFoundHandler);

@@ -1,3 +1,5 @@
+// models/user.model.js
+
 'use strict';
 
 const { Model } = require('sequelize');

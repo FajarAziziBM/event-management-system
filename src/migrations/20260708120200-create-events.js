@@ -1,3 +1,5 @@
+// migrations/20260708120200-create-events.js
+
 'use strict';
 
 /** @type {import('sequelize-cli').Migration} */

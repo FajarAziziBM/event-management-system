@@ -1,3 +1,4 @@
+// migrations/20260708120100-create-categories.js
 'use strict';
 
 /** @type {import('sequelize-cli').Migration} */
