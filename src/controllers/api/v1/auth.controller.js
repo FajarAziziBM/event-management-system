@@ -20,6 +20,38 @@ class AuthController {
       return next(error);
     }
   }
+
+  static async login(req, res, next) {
+    try {
+
+      const { token, user } =
+        await AuthService.login(req.body);
+
+
+      res.cookie(
+        'token',
+        token,
+        {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === 'production',
+          sameSite: 'lax',
+          maxAge: 24 * 60 * 60 * 1000,
+        }
+      );
+
+
+      return res.status(200).json(
+        ApiResponse.success(
+          'Login successful',
+          user
+        )
+      );
+
+
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 module.exports = AuthController;
