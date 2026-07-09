@@ -1,0 +1,102 @@
+'use strict';
+
+/** @type {import('sequelize-cli').Migration} */
+module.exports = {
+  async up(queryInterface) {
+    const [orders] = await queryInterface.sequelize.query(
+      `SELECT id, order_number FROM orders WHERE order_number LIKE 'ORD-20260708-SEED%'`,
+    );
+    const orderId = (num) => orders.find((o) => o.order_number === num).id;
+    const now = new Date();
+    const pastEventTime = new Date('2026-06-19T10:00:00+07:00');
+
+    await queryInterface.bulkInsert('payments', [
+      {
+        order_id: orderId('ORD-20260708-SEED01'),
+        provider: 'xendit',
+        invoice_id: 'seed-inv-000001',
+        external_id: 'ORD-20260708-SEED01',
+        payment_url: 'https://checkout-staging.xendit.co/web/seed-inv-000001',
+        status: 'paid',
+        expired_at: new Date(now.getTime() + 60 * 60 * 1000),
+        paid_at: now,
+        created_at: now,
+        updated_at: now,
+      },
+      {
+        order_id: orderId('ORD-20260708-SEED02'),
+        provider: 'xendit',
+        invoice_id: 'seed-inv-000002',
+        external_id: 'ORD-20260708-SEED02',
+        payment_url: 'https://checkout-staging.xendit.co/web/seed-inv-000002',
+        status: 'paid',
+        expired_at: new Date(now.getTime() + 60 * 60 * 1000),
+        paid_at: now,
+        created_at: now,
+        updated_at: now,
+      },
+      {
+        order_id: orderId('ORD-20260708-SEED03'),
+        provider: 'xendit',
+        invoice_id: 'seed-inv-000003',
+        external_id: 'ORD-20260708-SEED03',
+        payment_url: 'https://checkout-staging.xendit.co/web/seed-inv-000003',
+        status: 'pending',
+        expired_at: new Date(now.getTime() + 60 * 60 * 1000),
+        paid_at: null,
+        created_at: now,
+        updated_at: now,
+      },
+      {
+        order_id: orderId('ORD-20260708-SEED04'),
+        provider: 'xendit',
+        invoice_id: 'seed-inv-000004',
+        external_id: 'ORD-20260708-SEED04',
+        payment_url: 'https://checkout-staging.xendit.co/web/seed-inv-000004',
+        status: 'expired',
+        expired_at: new Date(now.getTime() - 24 * 60 * 60 * 1000),
+        paid_at: null,
+        created_at: new Date(now.getTime() - 25 * 60 * 60 * 1000),
+        updated_at: new Date(now.getTime() - 24 * 60 * 60 * 1000),
+      },
+      {
+        // Invoice sempat terbuat, tapi customer batal sebelum bayar -> tetap 'pending' di sisi Xendit
+        order_id: orderId('ORD-20260708-SEED05'),
+        provider: 'xendit',
+        invoice_id: 'seed-inv-000005',
+        external_id: 'ORD-20260708-SEED05',
+        payment_url: 'https://checkout-staging.xendit.co/web/seed-inv-000005',
+        status: 'pending',
+        expired_at: new Date(now.getTime() + 60 * 60 * 1000),
+        paid_at: null,
+        created_at: now,
+        updated_at: now,
+      },
+      {
+        order_id: orderId('ORD-20260708-SEED06'),
+        provider: 'xendit',
+        invoice_id: 'seed-inv-000006',
+        external_id: 'ORD-20260708-SEED06',
+        payment_url: 'https://checkout-staging.xendit.co/web/seed-inv-000006',
+        status: 'paid',
+        expired_at: new Date(pastEventTime.getTime() + 60 * 60 * 1000),
+        paid_at: pastEventTime,
+        created_at: pastEventTime,
+        updated_at: pastEventTime,
+      },
+    ]);
+  },
+
+  async down(queryInterface) {
+    await queryInterface.bulkDelete('payments', {
+      external_id: [
+        'ORD-20260708-SEED01',
+        'ORD-20260708-SEED02',
+        'ORD-20260708-SEED03',
+        'ORD-20260708-SEED04',
+        'ORD-20260708-SEED05',
+        'ORD-20260708-SEED06',
+      ],
+    });
+  },
+};
