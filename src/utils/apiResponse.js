@@ -1,4 +1,3 @@
-// src/utils/apiResponse.js
 
 'use strict';
 
