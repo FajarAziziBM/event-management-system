@@ -5,93 +5,166 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
-const { User } = require('../models');
-const { ConflictError, UnauthorizedError } = require('../utils/errors');
-
 const config = require('../config/env');
-
-const SALT_ROUNDS = Number(process.env.BCRYPT_SALT_ROUNDS) || 12;
-
+const { UnauthorizedError, ValidationError } = require('../utils/errors');
+const db = require('../models');
 
 class AuthService {
-
-  static async register({ name, email, password, phone }) {
-
-    const existingUser = await User.findOne({
-      where: { email },
-    });
-
+  /**
+   * AUTH-01: Registrasi user baru (role default: 'customer')
+   */
+  static async register(name, email, password, role = 'customer') {
+    // Validasi keberadaan user
+    const existingUser = await db.User.findOne({ where: { email } });
     if (existingUser) {
-      throw new ConflictError('Email already exists');
+      throw new ValidationError('Email sudah terdaftar', { field: 'email' });
     }
 
+    // Hash password
+    const hashedPassword = await bcrypt.hash(password, config.auth.bcryptSaltRounds);
 
-    const hashedPassword = await bcrypt.hash(
-      password,
-      SALT_ROUNDS
-    );
-
-
-    const user = await User.create({
+    // Buat user baru
+    const user = await db.User.create({
       name,
       email,
       password: hashedPassword,
-      phone,
-      role: 'customer',
+      role,
     });
-
 
     return user.toSafeJSON();
   }
 
+  /**
+   * AUTH-02: Login — return JWT token (dipasang di cookie httpOnly)
+   */
+  static async login(email, password) {
+    const user = await db.User.findOne({ where: { email } });
 
-  static async login({ email, password }) {
+    if (!user || !(await this.validatePassword(password, user.password))) {
+      throw new UnauthorizedError('Email atau password salah');
+    }
 
-    const user = await User.findOne({
-      where: { email },
-    });
+    const token = this.generateToken(user);
+    return { user: user.toSafeJSON(), token };
+  }
 
+  /**
+   * AUTH-04: Forgot password — generate reset token & kirim email (email via NOTIF-04 di epic NOTIF)
+   */
+  static async forgotPassword(email) {
+    const user = await db.User.findOne({ where: { email } });
 
     if (!user) {
-      throw new UnauthorizedError(
-        'Invalid email or password'
-      );
+      // Jangan reveal apakah email ada atau tidak (security best practice)
+      // Tapi tetap return success supaya attacker tidak bisa enumerate email
+      return { success: true, message: 'Jika email terdaftar, reset link sudah dikirim' };
     }
 
+    // Generate reset token (berlaku 1 jam)
+    const _resetToken = jwt.sign({ userId: user.id, type: 'reset' }, config.auth.jwtSecret, {
+      expiresIn: '1h',
+    });
 
-    const passwordMatch = await bcrypt.compare(
-      password,
-      user.password
-    );
+    // TODO (Epic NOTIF): kirim email ke user.email dengan link:
+    // ${config.app.url}/auth/reset-password?token=${resetToken}
 
+    return { success: true, message: 'Jika email terdaftar, reset link sudah dikirim' };
+  }
 
-    if (!passwordMatch) {
-      throw new UnauthorizedError(
-        'Invalid email or password'
-      );
+  /**
+   * AUTH-05: Reset password via token
+   */
+  static async resetPassword(token, newPassword) {
+    let decoded;
+
+    try {
+      decoded = jwt.verify(token, config.auth.jwtSecret);
+    } catch {
+      throw new UnauthorizedError('Token reset password tidak valid atau sudah expired');
     }
 
+    if (decoded.type !== 'reset') {
+      throw new UnauthorizedError('Token tidak valid');
+    }
 
-    const token = jwt.sign(
+    const user = await db.User.findByPk(decoded.userId);
+    if (!user) {
+      throw new UnauthorizedError('User tidak ditemukan');
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, config.auth.bcryptSaltRounds);
+    await user.update({ password: hashedPassword });
+
+    return { success: true, message: 'Password berhasil direset' };
+  }
+
+  /**
+   * AUTH-08: Middleware authenticate — validasi JWT dari cookie/header
+   * Dipanggil dari middleware, bukan service, tapi helper ada di sini
+   */
+  static verifyAndDecodeToken(token) {
+    try {
+      const decoded = jwt.verify(token, config.auth.jwtSecret);
+      return decoded;
+    } catch {
+      throw new UnauthorizedError('Token tidak valid atau sudah expired');
+    }
+  }
+
+  /**
+   * Generate JWT token
+   */
+  static generateToken(user) {
+    return jwt.sign(
       {
         id: user.id,
         email: user.email,
         role: user.role,
       },
       config.auth.jwtSecret,
-      {
-        expiresIn: config.auth.jwtExpiresIn,
-      }
+      { expiresIn: config.auth.jwtExpiresIn },
     );
-
-
-    return {
-      token,
-      user: user.toSafeJSON(),
-    };
   }
 
-}
+  /**
+   * Validasi password plain vs hashed
+   */
+  static async validatePassword(plainPassword, hashedPassword) {
+    return bcrypt.compare(plainPassword, hashedPassword);
+  }
 
+  /**
+   * AUTH-06: Update profil user
+   */
+  static async updateProfile(userId, { name, phone, avatar }) {
+    const user = await db.User.findByPk(userId);
+    if (!user) {
+      throw new UnauthorizedError('User tidak ditemukan');
+    }
+
+    await user.update({ name, phone, avatar });
+    return user.toSafeJSON();
+  }
+
+  /**
+   * AUTH-07: Change password — butuh password lama untuk verifikasi
+   */
+  static async changePassword(userId, { oldPassword, newPassword }) {
+    const user = await db.User.findByPk(userId);
+    if (!user) {
+      throw new UnauthorizedError('User tidak ditemukan');
+    }
+
+    const passwordValid = await this.validatePassword(oldPassword, user.password);
+    if (!passwordValid) {
+      throw new ValidationError('Password lama salah', { field: 'oldPassword' });
+    }
+
+    const hashedPassword = await bcrypt.hash(newPassword, config.auth.bcryptSaltRounds);
+    await user.update({ password: hashedPassword });
+
+    return { success: true, message: 'Password berhasil diubah' };
+  }
+}
 
 module.exports = AuthService;

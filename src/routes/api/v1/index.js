@@ -1,17 +1,21 @@
-// src/routes/api/v1/index.js
-
 'use strict';
 
 const express = require('express');
+const ApiResponse = require('../../../utils/ApiResponse');
 
 const router = express.Router();
 
-const authRoute = require('./auth.route');
+const authRoute = require('./auth');
 
 router.use('/auth', authRoute);
 
-router.get('/', (req, res) => {
-  res.render('index', { title: 'Beranda' });
+router.get('/health', (req, res) => {
+  res.json(
+    ApiResponse.success('OK', {
+      uptime: process.uptime(),
+      timestamp: new Date().toISOString(),
+    }),
+  );
 });
 
 module.exports = router;
