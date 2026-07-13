@@ -77,6 +77,9 @@ const config = {
 
   order: {
     expiryMinutes: toInt(process.env.ORDER_EXPIRY_MINUTES, 60),
+    // Persentase biaya layanan dari subtotal — bukan bagian spesifikasi asli,
+    // keputusan desain saat implementasi ORD-03 (lihat catatan Epic ORD).
+    serviceFeePercentage: toInt(process.env.SERVICE_FEE_PERCENTAGE, 2),
   },
 
   xendit: {
