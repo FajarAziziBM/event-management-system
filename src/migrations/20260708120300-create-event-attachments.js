@@ -1,5 +1,4 @@
-// migrations/20260708120300-create-event-attachments.js
-
+// src/migrations/20260708120300-create-event-attachments.js
 'use strict';
 
 /** @type {import('sequelize-cli').Migration} */

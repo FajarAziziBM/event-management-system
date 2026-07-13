@@ -1,5 +1,4 @@
-// services/auth.service.js
-
+// src/services/auth.service.js
 'use strict';
 
 const bcrypt = require('bcrypt');

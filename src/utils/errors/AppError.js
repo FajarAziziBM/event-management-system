@@ -1,3 +1,4 @@
+// src/utils/errors/AppError.js
 'use strict';
 
 /**

@@ -1,3 +1,4 @@
+// src/middlewares/auth.middleware.js
 'use strict';
 
 const AuthService = require('../services/auth.service');

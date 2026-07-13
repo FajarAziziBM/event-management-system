@@ -1,3 +1,4 @@
+// src/models/eventAttachment.model.js
 'use strict';
 
 const { Model } = require('sequelize');

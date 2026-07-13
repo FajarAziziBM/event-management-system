@@ -1,5 +1,4 @@
-// routes/api/v1/auth.js
-
+// src/routes/api/v1/auth.js
 'use strict';
 
 const express = require('express');

@@ -1,5 +1,4 @@
 // src/config/database.js
-
 'use strict';
 
 const config = require('./env');

@@ -1,5 +1,4 @@
-// models/user.model.js
-
+// src/models/user.model.js
 'use strict';
 
 const { Model } = require('sequelize');
@@ -51,15 +50,6 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: true,
       },
-      resetPasswordToken: {
-        type: DataTypes.STRING,
-        allowNull: true,
-      },
-
-      resetPasswordExpires: {
-        type: DataTypes.DATE,
-        allowNull: true,
-      },
     },
     {
       sequelize,
@@ -67,8 +57,6 @@ module.exports = (sequelize, DataTypes) => {
       tableName: 'users',
       underscored: true,
     },
-
-
   );
 
   return User;

@@ -1,3 +1,4 @@
+// src/utils/errors/ValidationError.js
 'use strict';
 
 const AppError = require('./AppError');

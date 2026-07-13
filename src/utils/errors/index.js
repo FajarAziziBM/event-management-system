@@ -1,3 +1,4 @@
+// src/utils/errors/index.js
 'use strict';
 
 module.exports = {

@@ -1,5 +1,4 @@
-// controllers/web/auth.controller.js
-
+// src/controllers/web/auth.controller.js
 'use strict';
 
 const AuthService = require('../../services/auth.service');

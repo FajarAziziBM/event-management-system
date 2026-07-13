@@ -1,14 +1,12 @@
-// seeders/20260708130400-demo-event-attachments.js
-
+// src/seeders/20260708130400-demo-event-attachments.js
 'use strict';
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface) {
-    const [events] = await queryInterface.sequelize.query(
-      `SELECT id, slug FROM events WHERE slug IN ('konser-musik-indie-jakarta-2026', 'seminar-teknologi-ai-2026')`,
-    );
-    const eventId = (slug) => events.find((e) => e.slug === slug).id;
+    // Event ID dari demo-events:
+    // konser-musik-indie-jakarta-2026 = id 1
+    // seminar-teknologi-ai-2026 = id 3
     const now = new Date();
 
     // Catatan: file_path di sini hanya representasi skema (belum ada file fisik
@@ -16,14 +14,14 @@ module.exports = {
     // di Epic EVT (EVT-06/EVT-07).
     await queryInterface.bulkInsert('event_attachments', [
       {
-        event_id: eventId('konser-musik-indie-jakarta-2026'),
+        event_id: 1,
         file_name: 'rundown-acara.pdf',
         file_path: 'uploads/events/seed/rundown-acara.pdf',
         file_type: 'application/pdf',
         created_at: now,
       },
       {
-        event_id: eventId('seminar-teknologi-ai-2026'),
+        event_id: 3,
         file_name: 'materi-presentasi.pdf',
         file_path: 'uploads/events/seed/materi-presentasi.pdf',
         file_type: 'application/pdf',

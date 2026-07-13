@@ -1,5 +1,4 @@
 // src/app.js
-
 'use strict';
 
 const path = require('node:path');
@@ -14,9 +13,6 @@ const logger = require('./config/logger');
 const { flashMiddleware } = require('./utils/flash');
 const routes = require('./routes');
 const { notFoundHandler, errorHandler } = require('./middlewares/error.middleware');
-
-const apiRoutes = require('./routes/api/v1');
-
 
 const app = express();
 
@@ -39,13 +35,18 @@ app.use(morgan('combined', { stream: logger.stream }));
 
 // --- Security middleware (helmet, cors, rate-limit) → lihat Epic SEC ---
 
-// --- Flash message berbasis cookie (SETUP-09), tanpa express-session ---
+// --- Middleware untuk pass user ke semua EJS views, bahkan jika belum login ---
+const { authenticateOptional } = require('./middlewares/auth.middleware');
+
+app.use(authenticateOptional);
+app.use((req, res, next) => {
+  res.locals.user = req.user || null;
+  next();
+});
 app.use(flashMiddleware);
 
 // --- Routes ---
 app.use(routes);
-
-app.use('/api/v1', apiRoutes);
 
 // --- 404 & global error handler (SETUP-07) — HARUS paling akhir ---
 app.use(notFoundHandler);

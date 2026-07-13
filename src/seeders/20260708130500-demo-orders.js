@@ -1,17 +1,23 @@
-// seeders/20260708130500-demo-orders.js
-
+// src/seeders/20260708130500-demo-orders.js
 'use strict';
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface) {
-    const [users] = await queryInterface.sequelize.query(
-      `SELECT id, email FROM users WHERE email IN ('andi@example.com', 'citra@example.com', 'doni@example.com')`,
-    );
-    const [events] = await queryInterface.sequelize.query('SELECT id, slug FROM events');
-
-    const userId = (email) => users.find((u) => u.email === email).id;
-    const eventId = (slug) => events.find((e) => e.slug === slug).id;
+    // User ID dari demo-organizers-customers:
+    // andi@example.com = 4, citra@example.com = 5, doni@example.com = 6
+    // Event ID dari demo-events:
+    // konser (1), workshop (2), seminar (3), kuliner (5), meetup (6)
+    const andiId = 4;
+    const citraId = 5;
+    const doniId = 6;
+    const eventIds = {
+      konser: 1,
+      workshop: 2,
+      seminar: 3,
+      kuliner: 5,
+      meetup: 6,
+    };
     const now = new Date();
     const pastEventTime = new Date('2026-06-19T10:00:00+07:00');
 
@@ -19,8 +25,8 @@ module.exports = {
       {
         // Lunas, tiket sudah terbit (lihat seeder tickets)
         order_number: 'ORD-20260708-SEED01',
-        user_id: userId('andi@example.com'),
-        event_id: eventId('konser-musik-indie-jakarta-2026'),
+        user_id: andiId,
+        event_id: eventIds.konser,
         quantity: 2,
         subtotal: 300000,
         service_fee: 5000,
@@ -35,8 +41,8 @@ module.exports = {
       {
         // Lunas via e-wallet
         order_number: 'ORD-20260708-SEED02',
-        user_id: userId('citra@example.com'),
-        event_id: eventId('workshop-digital-marketing-untuk-umkm'),
+        user_id: citraId,
+        event_id: eventIds.workshop,
         quantity: 1,
         subtotal: 250000,
         service_fee: 5000,
@@ -51,8 +57,8 @@ module.exports = {
       {
         // Masih menunggu pembayaran (invoice belum expired)
         order_number: 'ORD-20260708-SEED03',
-        user_id: userId('doni@example.com'),
-        event_id: eventId('seminar-teknologi-ai-2026'),
+        user_id: doniId,
+        event_id: eventIds.seminar,
         quantity: 3,
         subtotal: 300000,
         service_fee: 5000,
@@ -67,8 +73,8 @@ module.exports = {
       {
         // Lewat batas waktu, kuota sudah dikembalikan ke event
         order_number: 'ORD-20260708-SEED04',
-        user_id: userId('andi@example.com'),
-        event_id: eventId('festival-kuliner-nusantara'),
+        user_id: andiId,
+        event_id: eventIds.kuliner,
         quantity: 1,
         subtotal: 50000,
         service_fee: 2000,
@@ -83,8 +89,8 @@ module.exports = {
       {
         // Dibatalkan customer sebelum bayar
         order_number: 'ORD-20260708-SEED05',
-        user_id: userId('citra@example.com'),
-        event_id: eventId('konser-musik-indie-jakarta-2026'),
+        user_id: citraId,
+        event_id: eventIds.konser,
         quantity: 2,
         subtotal: 300000,
         service_fee: 5000,
@@ -99,8 +105,8 @@ module.exports = {
       {
         // Event komunitas gratis di masa lalu, sudah dihadiri (lihat seeder tickets)
         order_number: 'ORD-20260708-SEED06',
-        user_id: userId('doni@example.com'),
-        event_id: eventId('meetup-developer-jakarta-12'),
+        user_id: doniId,
+        event_id: eventIds.meetup,
         quantity: 1,
         subtotal: 0,
         service_fee: 0,

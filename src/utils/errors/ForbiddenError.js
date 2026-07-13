@@ -1,3 +1,4 @@
+// src/utils/errors/ForbiddenError.js
 'use strict';
 
 const AppError = require('./AppError');

@@ -1,3 +1,4 @@
+// src/utils/errors/PaymentError.js
 'use strict';
 
 const AppError = require('./AppError');

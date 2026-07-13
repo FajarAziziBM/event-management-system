@@ -1,5 +1,4 @@
-// routes/web/auth.js
-
+// src/routes/web/auth.js
 'use strict';
 
 const express = require('express');

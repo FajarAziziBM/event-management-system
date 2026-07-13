@@ -1,13 +1,22 @@
+// src/routes/api/v1/index.js
 'use strict';
 
 const express = require('express');
+
 const ApiResponse = require('../../../utils/ApiResponse');
+const authRoutes = require('./auth');
+const categoryRoutes = require('./category');
+const eventRoutes = require('./event');
+const attachmentRoutes = require('./attachment');
+const organizerRoutes = require('./organizer');
 
 const router = express.Router();
 
-const authRoute = require('./auth');
-
-router.use('/auth', authRoute);
+router.use('/auth', authRoutes);
+router.use('/categories', categoryRoutes);
+router.use('/events', eventRoutes);
+router.use('/attachments', attachmentRoutes);
+router.use('/organizer', organizerRoutes);
 
 router.get('/health', (req, res) => {
   res.json(

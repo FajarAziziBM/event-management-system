@@ -1,3 +1,4 @@
+// src/utils/flash.js
 'use strict';
 
 const FLASH_COOKIE = 'flash';

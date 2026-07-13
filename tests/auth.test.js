@@ -1,3 +1,4 @@
+// tests/auth.test.js
 'use strict';
 
 const request = require('supertest');
@@ -128,9 +129,7 @@ describe('AUTH - Endpoints', () => {
     });
 
     it('ambil profil user dengan valid token', async () => {
-      const res = await request(app)
-        .get('/api/v1/auth/me')
-        .set('Authorization', `Bearer ${token}`);
+      const res = await request(app).get('/api/v1/auth/me').set('Authorization', `Bearer ${token}`);
 
       expect(res.status).toBe(200);
       expect(res.body.success).toBe(true);

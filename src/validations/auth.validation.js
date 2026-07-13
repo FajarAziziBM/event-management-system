@@ -1,3 +1,4 @@
+// src/validations/auth.validation.js
 'use strict';
 
 const { body, validationResult } = require('express-validator');

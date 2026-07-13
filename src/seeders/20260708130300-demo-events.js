@@ -1,5 +1,4 @@
-// seeders/20260708130300-demo-events.js
-
+// src/seeders/20260708130300-demo-events.js
 'use strict';
 
 /** @type {import('sequelize-cli').Migration} */

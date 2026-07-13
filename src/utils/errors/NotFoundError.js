@@ -1,3 +1,4 @@
+// src/utils/errors/NotFoundError.js
 'use strict';
 
 const AppError = require('./AppError');

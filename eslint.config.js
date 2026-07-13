@@ -1,3 +1,4 @@
+// eslint.config.js
 'use strict';
 
 const { defineConfig, globalIgnores } = require('eslint/config');

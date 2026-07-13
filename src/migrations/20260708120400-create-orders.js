@@ -1,5 +1,4 @@
-// migrations/20260708120400-create-orders.js
-
+// src/migrations/20260708120400-create-orders.js
 'use strict';
 
 /** @type {import('sequelize-cli').Migration} */

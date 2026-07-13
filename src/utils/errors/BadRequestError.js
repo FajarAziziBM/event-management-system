@@ -1,3 +1,4 @@
+// src/utils/errors/BadRequestError.js
 'use strict';
 
 const AppError = require('./AppError');

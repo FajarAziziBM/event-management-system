@@ -1,3 +1,4 @@
+// src/models/payment.model.js
 'use strict';
 
 const { Model } = require('sequelize');

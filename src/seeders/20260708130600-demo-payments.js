@@ -1,20 +1,16 @@
-// seeders/20260708130600-demo-payments.js
-
+// src/seeders/20260708130600-demo-payments.js
 'use strict';
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface) {
-    const [orders] = await queryInterface.sequelize.query(
-      `SELECT id, order_number FROM orders WHERE order_number LIKE 'ORD-20260708-SEED%'`,
-    );
-    const orderId = (num) => orders.find((o) => o.order_number === num).id;
+    // Order ID dari demo-orders: SEED01-06 = id 1-6
     const now = new Date();
     const pastEventTime = new Date('2026-06-19T10:00:00+07:00');
 
     await queryInterface.bulkInsert('payments', [
       {
-        order_id: orderId('ORD-20260708-SEED01'),
+        order_id: 1,
         provider: 'xendit',
         invoice_id: 'seed-inv-000001',
         external_id: 'ORD-20260708-SEED01',
@@ -26,7 +22,7 @@ module.exports = {
         updated_at: now,
       },
       {
-        order_id: orderId('ORD-20260708-SEED02'),
+        order_id: 2,
         provider: 'xendit',
         invoice_id: 'seed-inv-000002',
         external_id: 'ORD-20260708-SEED02',
@@ -38,7 +34,7 @@ module.exports = {
         updated_at: now,
       },
       {
-        order_id: orderId('ORD-20260708-SEED03'),
+        order_id: 3,
         provider: 'xendit',
         invoice_id: 'seed-inv-000003',
         external_id: 'ORD-20260708-SEED03',
@@ -50,7 +46,7 @@ module.exports = {
         updated_at: now,
       },
       {
-        order_id: orderId('ORD-20260708-SEED04'),
+        order_id: 4,
         provider: 'xendit',
         invoice_id: 'seed-inv-000004',
         external_id: 'ORD-20260708-SEED04',
@@ -63,7 +59,7 @@ module.exports = {
       },
       {
         // Invoice sempat terbuat, tapi customer batal sebelum bayar -> tetap 'pending' di sisi Xendit
-        order_id: orderId('ORD-20260708-SEED05'),
+        order_id: 5,
         provider: 'xendit',
         invoice_id: 'seed-inv-000005',
         external_id: 'ORD-20260708-SEED05',
@@ -75,7 +71,7 @@ module.exports = {
         updated_at: now,
       },
       {
-        order_id: orderId('ORD-20260708-SEED06'),
+        order_id: 6,
         provider: 'xendit',
         invoice_id: 'seed-inv-000006',
         external_id: 'ORD-20260708-SEED06',

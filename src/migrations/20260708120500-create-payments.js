@@ -1,5 +1,4 @@
-// migrations/20260708120500-create-payments.js
-
+// src/migrations/20260708120500-create-payments.js
 'use strict';
 
 /** @type {import('sequelize-cli').Migration} */

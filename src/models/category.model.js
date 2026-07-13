@@ -1,3 +1,4 @@
+// src/models/category.model.js
 'use strict';
 
 const { Model } = require('sequelize');

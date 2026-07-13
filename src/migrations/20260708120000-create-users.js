@@ -1,4 +1,4 @@
-// migrations/20260708120000-create-users.js
+// src/migrations/20260708120000-create-users.js
 'use strict';
 
 /** @type {import('sequelize-cli').Migration} */
