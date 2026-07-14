@@ -1,54 +1,25 @@
-const success = (
-  res,
-  data = null,
-  message = "Success",
-  statusCode = 200
-) => {
+const success = (res, data = null, message = 'Success', statusCode = 200) => {
+  return res.status(statusCode).json({
+    success: true,
 
-  return res
-    .status(statusCode)
-    .json({
+    message,
 
-      success: true,
-
-      message,
-
-      data
-
-    });
-
+    data,
+  });
 };
 
+const error = (res, message = 'Error', statusCode = 500, errors = []) => {
+  return res.status(statusCode).json({
+    success: false,
 
+    message,
 
-const error = (
-  res,
-  message = "Error",
-  statusCode = 500,
-  errors = []
-) => {
-
-
-  return res
-    .status(statusCode)
-    .json({
-
-      success:false,
-
-      message,
-
-      errors
-
-    });
-
+    errors,
+  });
 };
-
-
 
 module.exports = {
-
   success,
 
-  error
-
+  error,
 };

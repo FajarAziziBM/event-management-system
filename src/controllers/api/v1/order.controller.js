@@ -2,15 +2,40 @@
 'use strict';
 
 const OrderService = require('../../../services/order.service');
+const PaymentService = require('../../../services/payment.service');
 const ApiResponse = require('../../../utils/ApiResponse');
+const logger = require('../../../config/logger');
 
 class OrderController {
-  /** ORD-01: POST /api/v1/orders */
+  /**
+   * ORD-01 & PAY-02: POST /api/v1/orders — order dibuat dulu (transaksi aman,
+   * tidak boleh gagal karena hal di luar kendali kita), BARU setelah itu coba
+   * buat invoice Xendit. Kalau Xendit gagal/down, order TETAP jadi (kuota
+   * pelanggan sudah diamankan) — payment_url bisa diambil lagi lewat
+   * GET /orders/:id/payment yang otomatis retry pembuatan invoice.
+   */
   static async create(req, res, next) {
     try {
       const { eventId, quantity } = req.body;
       const order = await OrderService.createOrder(req.user.id, { eventId, quantity });
-      res.status(201).json(ApiResponse.success('Order berhasil dibuat', order));
+
+      let paymentUrl = null;
+      try {
+        const payment = await PaymentService.createInvoiceForOrder(order.id);
+        paymentUrl = payment.paymentUrl;
+      } catch (err) {
+        logger.error('[order.create] Order dibuat, tapi invoice Xendit gagal dibuat', {
+          orderId: order.id,
+          error: err.message,
+        });
+      }
+
+      res.status(201).json(
+        ApiResponse.success('Order berhasil dibuat', {
+          ...order.toJSON(),
+          paymentUrl,
+        }),
+      );
     } catch (err) {
       next(err);
     }
