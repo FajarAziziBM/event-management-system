@@ -10,6 +10,7 @@ const eventRoutes = require('./event');
 const attachmentRoutes = require('./attachment');
 const organizerRoutes = require('./organizer');
 const orderRoutes = require('./order');
+const ticketRoutes = require('./ticket');
 
 const router = express.Router();
 
@@ -17,8 +18,9 @@ router.use('/auth', authRoutes);
 router.use('/categories', categoryRoutes);
 router.use('/events', eventRoutes);
 router.use('/attachments', attachmentRoutes);
-router.use('/orders', orderRoutes);
 router.use('/organizer', organizerRoutes);
+router.use('/orders', orderRoutes);
+router.use('/tickets', ticketRoutes);
 
 router.get('/health', (req, res) => {
   res.json(
