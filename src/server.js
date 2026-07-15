@@ -4,9 +4,11 @@
 const app = require('./app');
 const config = require('./config/env');
 const logger = require('./config/logger');
+const expireOrdersJob = require('./jobs/expireOrders.job');
 
 const server = app.listen(config.app.port, () => {
   logger.info(`EMS server berjalan di ${config.app.url} (env: ${config.env})`);
+  expireOrdersJob.start();
 });
 
 function shutdown(signal) {

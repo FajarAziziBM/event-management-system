@@ -6,6 +6,7 @@ const express = require('express');
 const OrganizerController = require('../../../controllers/api/v1/organizer.controller');
 const { authenticate, authorize } = require('../../../middlewares/auth.middleware');
 const { validateEventId } = require('../../../validations/event.validation');
+const { validateDateRangeQuery } = require('../../../validations/dashboard.validation');
 
 const router = express.Router();
 
@@ -16,6 +17,31 @@ router.get(
   authorize('organizer', 'admin'),
   validateEventId,
   OrganizerController.getEventStatistics,
+);
+
+// DASH-01: ringkasan dashboard organizer
+router.get(
+  '/dashboard',
+  authenticate,
+  authorize('organizer', 'admin'),
+  OrganizerController.getDashboard,
+);
+
+// DASH-03: laporan penjualan (opsional ?startDate=&endDate=)
+router.get(
+  '/reports/sales',
+  authenticate,
+  authorize('organizer', 'admin'),
+  validateDateRangeQuery,
+  OrganizerController.getSalesReport,
+);
+
+// DASH-04: performa seluruh event milik organizer (perbandingan antar event)
+router.get(
+  '/reports/event-performance',
+  authenticate,
+  authorize('organizer', 'admin'),
+  OrganizerController.getEventPerformanceReport,
 );
 
 module.exports = router;
