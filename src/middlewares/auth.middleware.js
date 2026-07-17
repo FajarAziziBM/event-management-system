@@ -2,13 +2,19 @@
 'use strict';
 
 const AuthService = require('../services/auth.service');
+const db = require('../models');
 const { UnauthorizedError, ForbiddenError } = require('../utils/errors');
 
 /**
  * AUTH-08: authenticate — verifikasi JWT dari cookie atau header Authorization
  * Attach req.user jika valid, lempar UnauthorizedError jika tidak
+ *
+ * USR-05/06: setelah JWT terverifikasi, role & status suspend diambil ULANG
+ * dari DB (bukan dipercaya begitu saja dari klaim di dalam token) — supaya
+ * perubahan role (USR-05) atau suspend (USR-06) oleh admin langsung berlaku
+ * detik itu juga, tidak menunggu token lama expired (bisa sampai 1 hari).
  */
-function authenticate(req, res, next) {
+async function authenticate(req, res, next) {
   let token;
 
   // Cek cookie dulu (untuk EJS halaman), fallback ke header Authorization (untuk API clients)
@@ -24,7 +30,19 @@ function authenticate(req, res, next) {
 
   try {
     const decoded = AuthService.verifyAndDecodeToken(token);
-    req.user = decoded;
+
+    const user = await db.User.findByPk(decoded.id, {
+      attributes: ['id', 'email', 'role', 'isSuspended'],
+    });
+
+    if (!user) {
+      return next(new UnauthorizedError('User tidak ditemukan'));
+    }
+    if (user.isSuspended) {
+      return next(new ForbiddenError('Akun Anda telah disuspend, hubungi admin'));
+    }
+
+    req.user = { id: user.id, email: user.email, role: user.role };
     next();
   } catch (err) {
     next(err);
@@ -55,9 +73,11 @@ function authorize(...allowedRoles) {
 
 /**
  * Optional middleware untuk endpoint yang boleh diakses authenticated atau tidak
- * Attach req.user jika ada token valid, tapi jangan error jika tidak ada token
+ * Attach req.user jika ada token valid & user masih aktif, tapi jangan error
+ * kalau tidak ada token / token invalid / user disuspend — cukup dianggap
+ * anonymous (sesuai tujuan middleware ini: tidak pernah memblokir request).
  */
-function authenticateOptional(req, res, next) {
+async function authenticateOptional(req, res, next) {
   let token;
 
   if (req.cookies && req.cookies.token) {
@@ -69,7 +89,14 @@ function authenticateOptional(req, res, next) {
   if (token) {
     try {
       const decoded = AuthService.verifyAndDecodeToken(token);
-      req.user = decoded;
+
+      const user = await db.User.findByPk(decoded.id, {
+        attributes: ['id', 'email', 'role', 'isSuspended'],
+      });
+
+      if (user && !user.isSuspended) {
+        req.user = { id: user.id, email: user.email, role: user.role };
+      }
     } catch {
       // Token invalid, tapi jangan error — hanya anggap sebagai unauthenticated
     }

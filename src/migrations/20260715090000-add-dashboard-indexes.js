@@ -25,6 +25,15 @@ module.exports = {
   async down(queryInterface) {
     await queryInterface.removeIndex('orders', 'idx_orders_status_paid_at');
     await queryInterface.removeIndex('users', 'idx_users_role');
+
+    // Catatan: di beberapa kondisi MySQL menjadikan index komposit ini
+    // satu-satunya index yang menopang FK constraint tickets.event_id
+    // (tidak ada index tunggal terpisah untuk event_id), sehingga DROP INDEX
+    // langsung bisa ditolak. Buat dulu index tunggal pengganti supaya FK
+    // tetap punya index pendukung, baru hapus index kompositnya.
+    await queryInterface.addIndex('tickets', ['event_id'], {
+      name: 'idx_tickets_event_id_fallback',
+    });
     await queryInterface.removeIndex('tickets', 'idx_tickets_event_checkedin');
   },
 };

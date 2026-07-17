@@ -5,7 +5,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
 const config = require('../config/env');
-const { UnauthorizedError, ValidationError } = require('../utils/errors');
+const { UnauthorizedError, ForbiddenError, ValidationError } = require('../utils/errors');
 const db = require('../models');
 
 class AuthService {
@@ -41,6 +41,14 @@ class AuthService {
 
     if (!user || !(await this.validatePassword(password, user.password))) {
       throw new UnauthorizedError('Email atau password salah');
+    }
+
+    // USR-06: cek suspend SETELAH password tervalidasi (bukan sebelum) —
+    // supaya status suspend tidak bocor ke orang yang bahkan tidak tahu
+    // password akun ini; hanya yang memang punya kredensial benar yang
+    // mendapat pesan spesifik "akun disuspend".
+    if (user.isSuspended) {
+      throw new ForbiddenError('Akun Anda telah disuspend, hubungi admin');
     }
 
     const token = this.generateToken(user);

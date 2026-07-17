@@ -12,6 +12,7 @@ const organizerRoutes = require('./organizer');
 const orderRoutes = require('./order');
 const ticketRoutes = require('./ticket');
 const adminRoutes = require('./admin');
+const adminUserRoutes = require('./adminUser');
 
 const router = express.Router();
 
@@ -22,6 +23,7 @@ router.use('/attachments', attachmentRoutes);
 router.use('/organizer', organizerRoutes);
 router.use('/orders', orderRoutes);
 router.use('/tickets', ticketRoutes);
+router.use('/admin/users', adminUserRoutes);
 router.use('/admin', adminRoutes);
 
 router.get('/health', (req, res) => {
