@@ -200,7 +200,12 @@ describe('DASH - Dashboard & Reports', () => {
 
   describe('DASH-08: Caching endpoint admin platform-wide', () => {
     it('panggilan kedua getAdminDashboard TIDAK query DB lagi (kena cache)', async () => {
-      const spy = jest.spyOn(db.User, 'findAll');
+      // Spy ke Order.findAll (bukan User.findAll) karena authenticate middleware
+      // sendiri kini memanggil User.findByPk di SETIAP request (cek suspend/role
+      // terbaru, lihat USR-05/06) -- dan findByPk Sequelize secara internal
+      // memanggil findAll juga, jadi User.findAll bukan sinyal bersih lagi untuk
+      // membuktikan cache-hit. Order.findAll tidak disentuh middleware apapun.
+      const spy = jest.spyOn(db.Order, 'findAll');
 
       await request(app)
         .get('/api/v1/admin/dashboard')
@@ -212,6 +217,7 @@ describe('DASH - Dashboard & Reports', () => {
         .set('Authorization', `Bearer ${adminToken}`);
       const callsAfterSecond = spy.mock.calls.length;
 
+      expect(callsAfterFirst).toBeGreaterThan(0); // pastikan spy memang menangkap panggilan asli
       expect(callsAfterSecond).toBe(callsAfterFirst); // tidak nambah -> cache hit
       spy.mockRestore();
     });
