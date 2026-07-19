@@ -1,0 +1,19 @@
+<%- include('../partials/header', { title: 'Selamat Datang' }) %>
+<h2 style="font-family: Georgia, 'Times New Roman', serif; margin-top: 0">
+  Selamat Datang, <%= name %>!
+</h2>
+<p>
+  Akun Anda berhasil dibuat di Event Management System. Sekarang Anda bisa mulai menjelajahi
+  berbagai event menarik dan memesan tiket dengan mudah.
+</p>
+<p style="text-align: center; margin: 32px 0">
+  <a
+    href="<%= appUrl %>/events"
+    style="background-color: #d6a419; color: #14232e; padding: 12px 28px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block"
+    >Jelajahi Event</a
+  >
+</p>
+<p style="color: #5b6670; font-size: 13px">
+  Jika Anda tidak merasa mendaftar akun ini, abaikan saja email ini.
+</p>
+<%- include('../partials/footer') %>

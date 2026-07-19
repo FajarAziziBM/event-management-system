@@ -40,7 +40,9 @@ module.exports = {
         external_id: 'ORD-20260708-SEED03',
         payment_url: 'https://checkout-staging.xendit.co/web/seed-inv-000003',
         status: 'pending',
-        expired_at: new Date(now.getTime() + 60 * 60 * 1000),
+        // Konsisten dengan expired_at order SEED03 (1 tahun, bukan 1 jam) —
+        // lihat catatan di seeders/...-demo-orders.js
+        expired_at: new Date(now.getTime() + 365 * 24 * 60 * 60 * 1000),
         paid_at: null,
         created_at: now,
         updated_at: now,

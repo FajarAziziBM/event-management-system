@@ -6,6 +6,7 @@ const path = require('node:path');
 const { Op } = require('sequelize');
 
 const db = require('../models');
+const NotificationService = require('./notification.service');
 const {
   NotFoundError,
   ForbiddenError,
@@ -78,12 +79,18 @@ class EventService {
       status: 'draft',
     });
 
+    // NOTIF-05: alert internal ke admin — event baru dibuat
+    const organizer = await db.User.findByPk(creatorId, { attributes: ['id', 'name', 'email'] });
+    await NotificationService.notifyAdminNewEvent(event, organizer);
+
     return event;
   }
 
   /**
    * EVT-02: Edit event — hanya pemilik/admin. available_ticket disesuaikan
    * otomatis jika max_attendees berubah (bukan diubah langsung oleh caller).
+   * NOTIF-04: perubahan pada field signifikan (tanggal/venue/alamat)
+   * dinotifikasi ke seluruh pemegang tiket event ini.
    */
   static async updateEvent(id, userId, userRole, data) {
     const event = await this._findEventOrThrow(id);
@@ -110,7 +117,35 @@ class EventService {
       updatePayload.availableTicket = newAvailable;
     }
 
+    // NOTIF-04: rekam nilai field signifikan SEBELUM update untuk dibandingkan
+    const SIGNIFICANT_FIELDS = {
+      eventDate: 'Tanggal mulai',
+      eventEndDate: 'Tanggal selesai',
+      venue: 'Venue',
+      address: 'Alamat',
+    };
+    const oldValues = {};
+    Object.keys(SIGNIFICANT_FIELDS).forEach((field) => {
+      oldValues[field] = event[field] ? String(event[field]) : null;
+    });
+
     await event.update(updatePayload);
+
+    const changes = [];
+    Object.entries(SIGNIFICANT_FIELDS).forEach(([field, label]) => {
+      if (data[field] === undefined) return;
+      const newValue = event[field] ? String(event[field]) : null;
+      if (newValue !== oldValues[field]) {
+        changes.push(`${label} berubah menjadi: ${event[field]}`);
+      }
+    });
+
+    if (changes.length > 0) {
+      // Fungsi ini sendiri mengambil daftar pemegang tiket; kalau kosong
+      // (belum ada yang beli/event masih draft), Promise.all-nya otomatis no-op.
+      await NotificationService.sendEventUpdated(event, changes);
+    }
+
     return event;
   }
 
@@ -159,7 +194,8 @@ class EventService {
   }
 
   /**
-   * EVT-05: published -> draft ATAU closed (ditentukan oleh targetStatus)
+   * EVT-05: published -> draft / closed / cancelled (ditentukan targetStatus)
+   * NOTIF-04: transisi ke 'cancelled' memicu notifikasi ke seluruh pemegang tiket.
    */
   static async unpublishEvent(id, userId, userRole, targetStatus = 'draft') {
     const event = await this._findEventOrThrow(id);
@@ -172,6 +208,11 @@ class EventService {
     }
 
     await event.update({ status: targetStatus });
+
+    if (targetStatus === 'cancelled') {
+      await NotificationService.sendEventCancelled(event);
+    }
+
     return event;
   }
 

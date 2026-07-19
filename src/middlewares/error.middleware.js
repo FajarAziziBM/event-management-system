@@ -4,6 +4,7 @@
 const logger = require('../config/logger');
 const config = require('../config/env');
 const ApiResponse = require('../utils/ApiResponse');
+const NotificationService = require('../services/notification.service');
 const { AppError, NotFoundError } = require('../utils/errors');
 
 function isApiRequest(req) {
@@ -36,6 +37,17 @@ function errorHandler(err, req, res, next) {
     logger.error(`${req.method} ${req.originalUrl} -> 500: ${err.message}`, {
       stack: err.stack,
     });
+
+    // NOTIF-05: system alert ke admin untuk error TAK TERDUGA (bukan error
+    // bisnis biasa yang sudah rapi lewat AppError). Fire-and-forget —
+    // response error ke client yang menunggu tidak boleh ikut tertunda
+    // hanya karena mengirim email alert. .catch() jaga-jaga tambahan karena
+    // _getAdminEmails() sendiri melakukan query DB yang secara teori bisa throw
+    // (skenario paling mungkin memicu ini justru DB yang bermasalah).
+    NotificationService.notifyAdminSystemAlert(
+      `Error tak terduga: ${req.method} ${req.originalUrl}`,
+      `${err.message}\n\n${err.stack}`,
+    ).catch(() => {});
   }
 
   if (isApiRequest(req)) {

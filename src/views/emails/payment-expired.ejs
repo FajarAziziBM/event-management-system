@@ -1,0 +1,17 @@
+<%- include('../partials/header', { title: 'Pembayaran Kedaluwarsa' }) %>
+<h2 style="font-family: Georgia, 'Times New Roman', serif; margin-top: 0; color: #b3860f">
+  Waktu Pembayaran Habis
+</h2>
+<p>
+  Halo <%= name %>, batas waktu pembayaran untuk order <strong><%= orderNumber %></strong>
+  (<%= eventTitle %>) sudah lewat sebelum pembayaran kami terima.
+</p>
+<p>Kuota tiket Anda sudah kami kembalikan ke event. Silakan lakukan pemesanan ulang bila masih tersedia.</p>
+<p style="text-align: center; margin: 32px 0">
+  <a
+    href="<%= appUrl %>/events"
+    style="background-color: #d6a419; color: #14232e; padding: 12px 28px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block"
+    >Pesan Ulang</a
+  >
+</p>
+<%- include('../partials/footer') %>

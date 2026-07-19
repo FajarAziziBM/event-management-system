@@ -55,7 +55,13 @@ module.exports = {
         updated_at: now,
       },
       {
-        // Masih menunggu pembayaran (invoice belum expired)
+        // Masih menunggu pembayaran (invoice belum expired). Sengaja dibuat
+        // jauh ke depan (bukan cuma +1 jam) supaya order ini tetap
+        // merepresentasikan "masih pending" dalam jangka panjang -- kalau
+        // cuma +1 jam, begitu waktu ASLI berjalan lewat seed dibuat (mis.
+        // saat testing dilakukan berhari-hari kemudian), order ini akan
+        // ikut tertangkap job expirePendingOrders() yang sungguhan berjalan
+        // di test ORD-08, jadi berubah status padahal tidak diniatkan.
         order_number: 'ORD-20260708-SEED03',
         user_id: doniId,
         event_id: eventIds.seminar,
@@ -65,7 +71,7 @@ module.exports = {
         total_amount: 305000,
         payment_status: 'pending',
         payment_method: null,
-        expired_at: new Date(now.getTime() + 60 * 60 * 1000),
+        expired_at: new Date(now.getTime() + 365 * 24 * 60 * 60 * 1000),
         paid_at: null,
         created_at: now,
         updated_at: now,

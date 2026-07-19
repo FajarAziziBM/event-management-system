@@ -3,6 +3,7 @@
 
 const OrderService = require('../../../services/order.service');
 const PaymentService = require('../../../services/payment.service');
+const NotificationService = require('../../../services/notification.service');
 const ApiResponse = require('../../../utils/ApiResponse');
 const logger = require('../../../config/logger');
 
@@ -28,6 +29,8 @@ class OrderController {
           orderId: order.id,
           error: err.message,
         });
+        // NOTIF-05: alert internal admin — masalah pembayaran
+        await NotificationService.notifyAdminPaymentIssue(order, err.message);
       }
 
       res.status(201).json(
