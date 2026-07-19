@@ -1,0 +1,12 @@
+<%- include('../partials/header', { title: alertTitle }) %>
+<h2 style="font-family: Georgia, 'Times New Roman', serif; margin-top: 0">🔔 <%= alertTitle %></h2>
+<p><%= alertMessage %></p>
+<% if (typeof details !== 'undefined' && details) { %>
+<pre
+  style="background-color: #f3f5f6; padding: 12px; border-radius: 6px; font-size: 12px; overflow-x: auto; white-space: pre-wrap; word-break: break-word"
+><%= details %></pre>
+<% } %>
+<p style="color: #5b6670; font-size: 13px">
+  Notifikasi internal ini hanya dikirim ke admin platform.
+</p>
+<%- include('../partials/footer') %>

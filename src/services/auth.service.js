@@ -7,6 +7,7 @@ const jwt = require('jsonwebtoken');
 const config = require('../config/env');
 const { UnauthorizedError, ForbiddenError, ValidationError } = require('../utils/errors');
 const db = require('../models');
+const NotificationService = require('./notification.service');
 
 class AuthService {
   /**
@@ -29,6 +30,10 @@ class AuthService {
       password: hashedPassword,
       role,
     });
+
+    // NOTIF-02: MailService tidak pernah throw, jadi await di sini aman —
+    // kegagalan kirim email tidak akan menggagalkan registrasi itu sendiri.
+    await NotificationService.sendRegistrationSuccess(user);
 
     return user.toSafeJSON();
   }
@@ -68,12 +73,12 @@ class AuthService {
     }
 
     // Generate reset token (berlaku 1 jam)
-    const _resetToken = jwt.sign({ userId: user.id, type: 'reset' }, config.auth.jwtSecret, {
+    const resetToken = jwt.sign({ userId: user.id, type: 'reset' }, config.auth.jwtSecret, {
       expiresIn: '1h',
     });
 
-    // TODO (Epic NOTIF): kirim email ke user.email dengan link:
-    // ${config.app.url}/auth/reset-password?token=${resetToken}
+    // Melengkapi TODO sebelumnya (sekarang Epic NOTIF sudah selesai)
+    await NotificationService.sendPasswordReset(user, resetToken);
 
     return { success: true, message: 'Jika email terdaftar, reset link sudah dikirim' };
   }

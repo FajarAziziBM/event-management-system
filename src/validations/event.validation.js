@@ -76,8 +76,8 @@ const validateUnpublish = [
   eventIdParam,
   body('targetStatus')
     .optional()
-    .isIn(['draft', 'closed'])
-    .withMessage("targetStatus harus 'draft' atau 'closed'"),
+    .isIn(['draft', 'closed', 'cancelled'])
+    .withMessage("targetStatus harus 'draft', 'closed', atau 'cancelled'"),
   handleValidationErrors,
 ];
 

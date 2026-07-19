@@ -4,6 +4,7 @@
 const db = require('../models');
 const logger = require('../config/logger');
 const XenditService = require('./xendit.service');
+const NotificationService = require('./notification.service');
 const generateTicketCode = require('../utils/generateTicketCode');
 const { signQrPayload } = require('../utils/signQrPayload');
 const { NotFoundError, ForbiddenError, ConflictError } = require('../utils/errors');
@@ -116,6 +117,10 @@ class PaymentService {
    * jadi kalau Xendit retry webhook yang sama (atau dua webhook nyaris
    * bersamaan), request kedua akan menunggu request pertama commit, lalu
    * lihat status sudah berubah dan langsung skip (idempotent).
+   *
+   * NOTIF-03: pengiriman email dilakukan SETELAH transaksi di atas commit
+   * (bukan di dalamnya) — supaya tidak ada notifikasi "berhasil" terkirim
+   * kalau ternyata transaksinya rollback karena error di tengah jalan.
    */
   static async handleWebhook(payload) {
     const externalId = payload.external_id;
@@ -127,7 +132,7 @@ class PaymentService {
       invoiceId: payload.id,
     });
 
-    return db.sequelize.transaction(async (t) => {
+    const result = await db.sequelize.transaction(async (t) => {
       const payment = await db.Payment.findOne({
         where: { externalId },
         transaction: t,
@@ -140,7 +145,7 @@ class PaymentService {
       }
 
       // PAY-09: idempotency guard — status final tidak diproses ulang
-      if (['paid', 'expired'].includes(payment.status)) {
+      if (['paid', 'expired', 'failed'].includes(payment.status)) {
         logger.info('[webhook:xendit] Sudah diproses sebelumnya, skip (idempotent)', {
           externalId,
           currentStatus: payment.status,
@@ -156,9 +161,32 @@ class PaymentService {
         return this._handleExpired(payment, t);
       }
 
+      // Catatan: belum ada konfirmasi Xendit Invoice API benar-benar mengirim
+      // status literal 'FAILED' (dokumentasi resmi yang saya temukan hanya
+      // menyebut PENDING/PAID/SETTLED/EXPIRED) — handling ini ditambahkan
+      // sebagai jaga-jaga/forward-compatibility supaya NOTIF-03 (yang minta
+      // 3 skenario: success/failed/expired) benar-benar punya jalur nyata,
+      // bukan sekadar diasumsikan sama dengan expired.
+      if (status === 'FAILED') {
+        return this._handleFailed(payment, t);
+      }
+
       logger.info('[webhook:xendit] Status diabaikan (bukan status final)', { externalId, status });
       return { handled: true, ignored: true, status };
     });
+
+    if (result.notification) {
+      await this._sendPaymentNotification(result.notification);
+    }
+
+    return result;
+  }
+
+  static async _sendPaymentNotification({ type, ...data }) {
+    if (type === 'success') return NotificationService.sendPaymentSuccess(data);
+    if (type === 'failed') return NotificationService.sendPaymentFailed(data);
+    if (type === 'expired') return NotificationService.sendPaymentExpired(data);
+    return null;
   }
 
   /**
@@ -169,7 +197,13 @@ class PaymentService {
 
     await payment.update({ status: 'paid', paidAt }, { transaction: t });
 
-    const order = await db.Order.findByPk(payment.orderId, { transaction: t });
+    const order = await db.Order.findByPk(payment.orderId, {
+      include: [
+        { model: db.Event, as: 'event' },
+        { model: db.User, as: 'user' },
+      ],
+      transaction: t,
+    });
     await order.update(
       {
         paymentStatus: 'paid',
@@ -187,7 +221,21 @@ class PaymentService {
       ticketCount: tickets.length,
     });
 
-    return { handled: true, status: 'paid', ticketsGenerated: tickets.length };
+    return {
+      handled: true,
+      status: 'paid',
+      ticketsGenerated: tickets.length,
+      notification: {
+        type: 'success',
+        email: order.user.email,
+        name: order.user.name,
+        orderId: order.id,
+        orderNumber: order.orderNumber,
+        eventTitle: order.event.title,
+        quantity: order.quantity,
+        totalAmount: order.totalAmount,
+      },
+    };
   }
 
   /**
@@ -196,7 +244,13 @@ class PaymentService {
   static async _handleExpired(payment, t) {
     await payment.update({ status: 'expired' }, { transaction: t });
 
-    const order = await db.Order.findByPk(payment.orderId, { transaction: t });
+    const order = await db.Order.findByPk(payment.orderId, {
+      include: [
+        { model: db.Event, as: 'event' },
+        { model: db.User, as: 'user' },
+      ],
+      transaction: t,
+    });
 
     if (order.paymentStatus === 'pending') {
       await order.update({ paymentStatus: 'expired' }, { transaction: t });
@@ -218,7 +272,72 @@ class PaymentService {
       orderNumber: order.orderNumber,
     });
 
-    return { handled: true, status: 'expired' };
+    return {
+      handled: true,
+      status: 'expired',
+      notification: {
+        type: 'expired',
+        email: order.user.email,
+        name: order.user.name,
+        orderNumber: order.orderNumber,
+        eventTitle: order.event.title,
+      },
+    };
+  }
+
+  /**
+   * NOTIF-03 (skenario ketiga): status FAILED -> perlakuan sama seperti
+   * expired di level data (kuota kembali, tidak generate tiket), tapi
+   * payments.status mencatat 'failed' secara presisi (beda dari 'expired')
+   * untuk keperluan audit/laporan (DASH-07), dan email yang dikirim juga
+   * berbeda pesan ("gagal diproses" vs "waktu habis").
+   * Catatan enum: orders.payment_status TIDAK punya nilai 'failed' sendiri
+   * (hanya pending/paid/expired/cancelled/refunded), jadi di level order
+   * tetap dicatat sebagai 'expired' — payments.status adalah sumber
+   * kebenaran yang lebih presisi untuk membedakan failed vs expired.
+   */
+  static async _handleFailed(payment, t) {
+    await payment.update({ status: 'failed' }, { transaction: t });
+
+    const order = await db.Order.findByPk(payment.orderId, {
+      include: [
+        { model: db.Event, as: 'event' },
+        { model: db.User, as: 'user' },
+      ],
+      transaction: t,
+    });
+
+    if (order.paymentStatus === 'pending') {
+      await order.update({ paymentStatus: 'expired' }, { transaction: t });
+
+      const event = await db.Event.findByPk(order.eventId, {
+        transaction: t,
+        lock: t.LOCK.UPDATE,
+      });
+      if (event) {
+        await event.update(
+          { availableTicket: event.availableTicket + order.quantity },
+          { transaction: t },
+        );
+      }
+    }
+
+    logger.info('[webhook:xendit] Order FAILED diproses, kuota dikembalikan', {
+      orderId: order.id,
+      orderNumber: order.orderNumber,
+    });
+
+    return {
+      handled: true,
+      status: 'failed',
+      notification: {
+        type: 'failed',
+        email: order.user.email,
+        name: order.user.name,
+        orderNumber: order.orderNumber,
+        eventTitle: order.event.title,
+      },
+    };
   }
 
   /**

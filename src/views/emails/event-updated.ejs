@@ -1,0 +1,22 @@
+<%- include('../partials/header', { title: 'Pembaruan Event' }) %>
+<h2 style="font-family: Georgia, 'Times New Roman', serif; margin-top: 0">
+  Ada Perubahan pada Event Anda
+</h2>
+<p>
+  Halo <%= name %>, ada pembaruan informasi untuk event <strong><%= eventTitle %></strong> yang
+  tiketnya Anda miliki:
+</p>
+<ul style="padding-left: 20px">
+  <% changes.forEach(function (change) { %>
+  <li style="margin-bottom: 6px"><%= change %></li>
+  <% }); %>
+</ul>
+<p>Mohon perhatikan perubahan ini saat merencanakan kehadiran Anda.</p>
+<p style="text-align: center; margin: 32px 0">
+  <a
+    href="<%= appUrl %>/events/<%= eventSlug %>"
+    style="background-color: #d6a419; color: #14232e; padding: 12px 28px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block"
+    >Lihat Detail Event</a
+  >
+</p>
+<%- include('../partials/footer') %>

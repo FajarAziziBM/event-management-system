@@ -1,0 +1,20 @@
+<%- include('../partials/header', { title: 'Pembayaran Gagal' }) %>
+<h2 style="font-family: Georgia, 'Times New Roman', serif; margin-top: 0; color: #b3261e">
+  Pembayaran Gagal
+</h2>
+<p>
+  Halo <%= name %>, pembayaran untuk order <strong><%= orderNumber %></strong> (<%= eventTitle
+  %>) tidak berhasil diproses oleh penyedia pembayaran.
+</p>
+<p>
+  Kuota tiket Anda untuk order ini sudah kami kembalikan, jadi silakan coba lakukan pemesanan
+  ulang jika masih ingin hadir di event ini.
+</p>
+<p style="text-align: center; margin: 32px 0">
+  <a
+    href="<%= appUrl %>/events"
+    style="background-color: #d6a419; color: #14232e; padding: 12px 28px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block"
+    >Pesan Ulang</a
+  >
+</p>
+<%- include('../partials/footer') %>

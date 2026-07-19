@@ -6,6 +6,7 @@ const { Op } = require('sequelize');
 
 const db = require('../models');
 const config = require('../config/env');
+const NotificationService = require('./notification.service');
 const { NotFoundError, ValidationError, ConflictError } = require('../utils/errors');
 
 class UserService {
@@ -67,6 +68,11 @@ class UserService {
 
     const hashedPassword = await bcrypt.hash(password, config.auth.bcryptSaltRounds);
     const user = await db.User.create({ name, email, password: hashedPassword, role, phone });
+
+    // NOTIF-05: beri tahu admin LAIN (kalau ada lebih dari satu) bahwa ada organizer baru
+    if (role === 'organizer') {
+      await NotificationService.notifyAdminNewOrganizer(user);
+    }
 
     return user.toSafeJSON();
   }
@@ -156,7 +162,13 @@ class UserService {
       }
     }
 
+    const wasOrganizerBefore = user.role === 'organizer';
     await user.update({ role: newRole });
+
+    // NOTIF-05: baru jadi organizer (bukan yang SUDAH organizer sebelumnya)
+    if (newRole === 'organizer' && !wasOrganizerBefore) {
+      await NotificationService.notifyAdminNewOrganizer(user);
+    }
     return user.toSafeJSON();
   }
 

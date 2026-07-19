@@ -1,0 +1,33 @@
+<%- include('../partials/header', { title: 'Pembayaran Berhasil' }) %>
+<h2 style="font-family: Georgia, 'Times New Roman', serif; margin-top: 0; color: #1f6f4a">
+  ✓ Pembayaran Berhasil
+</h2>
+<p>Halo <%= name %>, pembayaran untuk order berikut telah kami terima:</p>
+<table style="width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 14px">
+  <tr>
+    <td style="padding: 8px 0; color: #5b6670">Event</td>
+    <td style="padding: 8px 0; text-align: right; font-weight: bold"><%= eventTitle %></td>
+  </tr>
+  <tr>
+    <td style="padding: 8px 0; color: #5b6670">No. Order</td>
+    <td style="padding: 8px 0; text-align: right"><%= orderNumber %></td>
+  </tr>
+  <tr>
+    <td style="padding: 8px 0; color: #5b6670">Jumlah Tiket</td>
+    <td style="padding: 8px 0; text-align: right"><%= quantity %></td>
+  </tr>
+  <tr>
+    <td style="padding: 8px 0; color: #5b6670; border-top: 1px solid #e2e6e8">Total Dibayar</td>
+    <td style="padding: 8px 0; text-align: right; font-weight: bold; border-top: 1px solid #e2e6e8">
+      Rp<%= Number(totalAmount).toLocaleString('id-ID') %>
+    </td>
+  </tr>
+</table>
+<p style="text-align: center; margin: 32px 0">
+  <a
+    href="<%= appUrl %>/orders/<%= orderId %>"
+    style="background-color: #d6a419; color: #14232e; padding: 12px 28px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block"
+    >Lihat Tiket Saya</a
+  >
+</p>
+<%- include('../partials/footer') %>
