@@ -3,6 +3,7 @@
 
 const EventService = require('../../../services/event.service');
 const DashboardService = require('../../../services/dashboard.service');
+const SearchService = require('../../../services/search.service');
 const ApiResponse = require('../../../utils/ApiResponse');
 
 class OrganizerController {
@@ -45,6 +46,32 @@ class OrganizerController {
     try {
       const report = await DashboardService.getEventPerformanceReport(req.user.id);
       res.json(ApiResponse.success('OK', report));
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  /** SEARCH-01: GET /api/v1/organizer/orders */
+  static async searchOrders(req, res, next) {
+    try {
+      const { orders, pagination } = await SearchService.searchOrganizerOrders(
+        req.user.id,
+        req.query,
+      );
+      res.json(ApiResponse.success('OK', { orders, pagination }));
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  /** SEARCH-01: GET /api/v1/organizer/tickets */
+  static async searchTickets(req, res, next) {
+    try {
+      const { tickets, pagination } = await SearchService.searchOrganizerTickets(
+        req.user.id,
+        req.query,
+      );
+      res.json(ApiResponse.success('OK', { tickets, pagination }));
     } catch (err) {
       next(err);
     }
