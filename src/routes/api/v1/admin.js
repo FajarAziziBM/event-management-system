@@ -6,6 +6,7 @@ const express = require('express');
 const AdminController = require('../../../controllers/api/v1/admin.controller');
 const { authenticate, authorize } = require('../../../middlewares/auth.middleware');
 const { validateDateRangeQuery } = require('../../../validations/dashboard.validation');
+const { validateSearchAllQuery } = require('../../../validations/search.validation');
 
 const router = express.Router();
 
@@ -32,6 +33,15 @@ router.get(
   authorize('admin'),
   validateDateRangeQuery,
   AdminController.getPaymentReport,
+);
+
+// SEARCH-02: pencarian lintas entitas (users/events/orders/payments)
+router.get(
+  '/search',
+  authenticate,
+  authorize('admin'),
+  validateSearchAllQuery,
+  AdminController.searchAll,
 );
 
 module.exports = router;

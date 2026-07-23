@@ -7,6 +7,10 @@ const OrganizerController = require('../../../controllers/api/v1/organizer.contr
 const { authenticate, authorize } = require('../../../middlewares/auth.middleware');
 const { validateEventId } = require('../../../validations/event.validation');
 const { validateDateRangeQuery } = require('../../../validations/dashboard.validation');
+const {
+  validateSearchOrdersQuery,
+  validateSearchTicketsQuery,
+} = require('../../../validations/search.validation');
 
 const router = express.Router();
 
@@ -42,6 +46,22 @@ router.get(
   authenticate,
   authorize('organizer', 'admin'),
   OrganizerController.getEventPerformanceReport,
+);
+
+// SEARCH-01: cari & filter order/tiket lintas semua event milik organizer
+router.get(
+  '/orders',
+  authenticate,
+  authorize('organizer', 'admin'),
+  validateSearchOrdersQuery,
+  OrganizerController.searchOrders,
+);
+router.get(
+  '/tickets',
+  authenticate,
+  authorize('organizer', 'admin'),
+  validateSearchTicketsQuery,
+  OrganizerController.searchTickets,
 );
 
 module.exports = router;

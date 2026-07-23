@@ -2,6 +2,7 @@
 'use strict';
 
 const DashboardService = require('../../../services/dashboard.service');
+const SearchService = require('../../../services/search.service');
 const ApiResponse = require('../../../utils/ApiResponse');
 
 class AdminController {
@@ -40,6 +41,16 @@ class AdminController {
     try {
       const report = await DashboardService.getPaymentReport(req.query);
       res.json(ApiResponse.success('OK', report));
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  /** SEARCH-02: GET /api/v1/admin/search?q=... */
+  static async searchAll(req, res, next) {
+    try {
+      const result = await SearchService.searchAll(req.query.q);
+      res.json(ApiResponse.success('OK', result));
     } catch (err) {
       next(err);
     }
