@@ -1,0 +1,94 @@
+<div class="max-w-7xl mx-auto px-4 py-10">
+  <div class="flex flex-wrap items-center justify-between gap-4 mb-8">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-900">Event Saya</h1>
+      <p class="text-gray-500 text-sm mt-1">Kelola seluruh event yang Anda buat.</p>
+    </div>
+    <a href="/events/create" class="bg-indigo-600 text-white px-5 py-2.5 rounded-xl font-semibold hover:bg-indigo-700 transition-colors flex items-center gap-2">
+      <i class="fas fa-plus"></i> Buat Event Baru
+    </a>
+  </div>
+
+  <% if (dashboard) { %>
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+    <div class="bg-white rounded-2xl border border-gray-100 p-5">
+      <p class="text-xs text-gray-500 mb-1">Total Event</p>
+      <p class="text-2xl font-bold text-gray-900"><%= dashboard.totalEvents %></p>
+    </div>
+    <div class="bg-white rounded-2xl border border-gray-100 p-5">
+      <p class="text-xs text-gray-500 mb-1">Tiket Terjual</p>
+      <p class="text-2xl font-bold text-gray-900"><%= dashboard.totalTicketsSold %></p>
+    </div>
+    <div class="bg-white rounded-2xl border border-gray-100 p-5">
+      <p class="text-xs text-gray-500 mb-1">Total Revenue</p>
+      <p class="text-2xl font-bold text-gray-900"><%= formatCurrency(dashboard.totalRevenue) %></p>
+    </div>
+    <div class="bg-white rounded-2xl border border-gray-100 p-5">
+      <p class="text-xs text-gray-500 mb-1">Total Peserta</p>
+      <p class="text-2xl font-bold text-gray-900"><%= dashboard.totalVisitors %></p>
+    </div>
+  </div>
+  <% } %>
+
+  <!-- Filter status -->
+  <div class="flex flex-wrap gap-2 mb-6">
+    <a href="/my-events" class="px-4 py-1.5 rounded-full text-sm font-medium <%= activeStatus==='all' ? 'bg-indigo-600 text-white' : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50' %>">Semua</a>
+    <a href="/my-events?status=draft" class="px-4 py-1.5 rounded-full text-sm font-medium <%= activeStatus==='draft' ? 'bg-indigo-600 text-white' : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50' %>">Draft</a>
+    <a href="/my-events?status=published" class="px-4 py-1.5 rounded-full text-sm font-medium <%= activeStatus==='published' ? 'bg-indigo-600 text-white' : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50' %>">Published</a>
+    <a href="/my-events?status=closed" class="px-4 py-1.5 rounded-full text-sm font-medium <%= activeStatus==='closed' ? 'bg-indigo-600 text-white' : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50' %>">Ditutup</a>
+    <a href="/my-events?status=cancelled" class="px-4 py-1.5 rounded-full text-sm font-medium <%= activeStatus==='cancelled' ? 'bg-indigo-600 text-white' : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50' %>">Dibatalkan</a>
+  </div>
+
+  <% if (events.length===0) { %>
+  <div class="text-center py-20 bg-white rounded-2xl border border-gray-100">
+    <div class="w-20 h-20 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
+      <i class="fas fa-calendar-plus text-gray-400 text-3xl"></i>
+    </div>
+    <h3 class="text-lg font-semibold text-gray-900 mb-1">Belum ada event</h3>
+    <p class="text-gray-500 mb-6">Mulai buat event pertama Anda sekarang.</p>
+    <a href="/events/create" class="bg-indigo-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-indigo-700 transition-colors inline-flex items-center gap-2">
+      <i class="fas fa-plus"></i> Buat Event Baru
+    </a>
+  </div>
+  <% } else { %>
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    <% events.forEach(function(event) { %>
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+      <div class="h-36 relative bg-gradient-to-br from-indigo-500 to-purple-600">
+        <% if (event.imagePath) { %>
+        <img src="<%= assetUrl(event.imagePath) %>" alt="<%= event.title %>" class="w-full h-full object-cover" />
+        <% } else { %>
+        <div class="w-full h-full flex items-center justify-center">
+          <i class="fas fa-<%= event.category ? event.category.icon : 'calendar-days' %> text-white/70 text-4xl"></i>
+        </div>
+        <% } %>
+        <span
+          class="absolute top-3 right-3 text-xs font-semibold px-3 py-1 rounded-full capitalize <%= event.status==='published' ? 'bg-green-100 text-green-700' : (event.status==='draft' ? 'bg-gray-100 text-gray-600' : (event.status==='cancelled' ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700')) %>"
+          ><%= event.status %></span
+        >
+      </div>
+      <div class="p-5">
+        <p class="text-indigo-600 text-xs font-semibold mb-1"><%= formatDate(event.eventDate) %></p>
+        <h3 class="font-bold text-gray-900 mb-2 line-clamp-2"><%= event.title %></h3>
+        <p class="text-gray-500 text-sm mb-4"><i class="fas fa-ticket mr-1"></i><%= event.availableTicket %>/<%= event.maxAttendees %> tiket tersisa</p>
+        <div class="flex items-center gap-2">
+          <a href="/events/<%= event.slug %>" class="flex-1 text-center border border-gray-200 text-gray-700 py-2 rounded-xl text-sm font-semibold hover:bg-gray-50 transition-colors">Lihat</a>
+          <a href="/events/<%= event.id %>/edit" class="flex-1 text-center bg-indigo-600 text-white py-2 rounded-xl text-sm font-semibold hover:bg-indigo-700 transition-colors">Edit</a>
+        </div>
+      </div>
+    </div>
+    <% }); %>
+  </div>
+
+  <% if (pagination.totalPages > 1) { %>
+  <div class="flex items-center justify-center gap-2 mt-10">
+    <% for (let p=1; p <=pagination.totalPages; p++) { %>
+    <a
+      href="/my-events?page=<%= p %><%= activeStatus !=='all' ? '&status=' + activeStatus : '' %>"
+      class="w-10 h-10 flex items-center justify-center rounded-lg font-medium <%= p===pagination.page ? 'bg-indigo-600 text-white' : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50' %>"
+      ><%= p %></a
+    >
+    <% } %>
+  </div>
+  <% } %> <% } %>
+</div>

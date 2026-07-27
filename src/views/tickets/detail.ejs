@@ -1,0 +1,54 @@
+<div class="max-w-2xl mx-auto px-4 py-10">
+  <a href="/orders/<%= ticket.orderId %>" class="text-indigo-600 text-sm font-medium hover:underline mb-4 inline-block"><i class="fas fa-arrow-left mr-1"></i>Kembali ke Pesanan</a>
+
+  <div class="bg-white rounded-3xl shadow-lg border border-gray-100 overflow-hidden">
+    <div class="bg-gradient-to-r from-indigo-600 to-purple-600 p-6 text-white text-center">
+      <p class="text-indigo-100 text-sm mb-1">E-Tiket</p>
+      <h1 class="text-xl font-bold"><%= ticket.event.title %></h1>
+    </div>
+
+    <div class="p-8 text-center border-b border-dashed border-gray-200">
+      <img src="<%= ticket.qrCodeImage %>" alt="QR Code Tiket" class="w-56 h-56 mx-auto mb-4" />
+      <p class="font-mono text-sm text-gray-500"><%= ticket.ticketCode %></p>
+      <% if (ticket.isCheckedIn) { %>
+      <span class="inline-block mt-3 bg-green-100 text-green-700 text-xs font-semibold px-3 py-1 rounded-full">
+        <i class="fas fa-circle-check mr-1"></i>Sudah Check-in <%= formatDateTime(ticket.checkedInAt) %>
+      </span>
+      <% } else { %>
+      <span class="inline-block mt-3 bg-indigo-50 text-indigo-700 text-xs font-semibold px-3 py-1 rounded-full">
+        <i class="fas fa-circle-info mr-1"></i>Tunjukkan QR ini saat masuk venue
+      </span>
+      <% } %>
+    </div>
+
+    <div class="p-6 space-y-4">
+      <div class="grid grid-cols-2 gap-4 text-sm">
+        <div>
+          <p class="text-gray-400 text-xs mb-1">Tanggal Event</p>
+          <p class="font-semibold text-gray-800"><%= formatDateTime(ticket.event.eventDate) %></p>
+        </div>
+        <div>
+          <p class="text-gray-400 text-xs mb-1">Venue</p>
+          <p class="font-semibold text-gray-800"><%= ticket.event.venue %></p>
+        </div>
+        <div>
+          <p class="text-gray-400 text-xs mb-1">Atas Nama</p>
+          <p class="font-semibold text-gray-800"><%= ticket.attendeeName %></p>
+        </div>
+        <div>
+          <p class="text-gray-400 text-xs mb-1">Email</p>
+          <p class="font-semibold text-gray-800 truncate"><%= ticket.attendeeEmail %></p>
+        </div>
+      </div>
+
+      <div class="flex gap-3 pt-2">
+        <a href="/tickets/<%= ticket.id %>/print" target="_blank" class="flex-1 text-center border border-gray-200 text-gray-700 py-3 rounded-xl font-semibold hover:bg-gray-50 transition-colors">
+          <i class="fas fa-print mr-2"></i>Versi Cetak
+        </a>
+        <a href="/api/v1/tickets/<%= ticket.id %>/download" class="flex-1 text-center bg-indigo-600 text-white py-3 rounded-xl font-semibold hover:bg-indigo-700 transition-colors">
+          <i class="fas fa-download mr-2"></i>Unduh PDF
+        </a>
+      </div>
+    </div>
+  </div>
+</div>

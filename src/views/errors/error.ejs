@@ -1,5 +1,21 @@
-<section class="error-page">
-  <h1><%= statusCode %></h1>
-  <p><%= message %></p>
-  <a href="/" class="btn btn--primary">Kembali ke Beranda</a>
-</section>
+<div class="max-w-2xl mx-auto px-4 py-24 text-center">
+  <div class="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-indigo-100 to-purple-100 rounded-full flex items-center justify-center">
+    <i class="fas <%= statusCode === 404 ? 'fa-map-signs' : (statusCode === 403 ? 'fa-lock' : 'fa-triangle-exclamation') %> text-indigo-600 text-4xl"></i>
+  </div>
+  <p class="text-indigo-600 font-bold text-lg mb-2"><%= statusCode %></p>
+  <h1 class="text-3xl font-bold text-gray-900 mb-3">
+    <% if (statusCode===404) { %>Halaman tidak ditemukan
+    <% } else if (statusCode===403) { %>Akses ditolak
+    <% } else { %>Terjadi kesalahan
+    <% } %>
+  </h1>
+  <p class="text-gray-600 mb-8"><%= message || 'Silakan coba lagi, atau kembali ke halaman utama.' %></p>
+  <div class="flex flex-col sm:flex-row gap-4 justify-center">
+    <a href="/" class="bg-indigo-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-indigo-700 transition-colors flex items-center justify-center">
+      <i class="fas fa-home mr-2"></i>Kembali ke Beranda
+    </a>
+    <a href="/events" class="bg-white border border-gray-300 text-gray-700 px-6 py-3 rounded-xl font-semibold hover:bg-gray-50 transition-colors flex items-center justify-center">
+      <i class="fas fa-calendar-alt mr-2"></i>Jelajahi Event
+    </a>
+  </div>
+</div>

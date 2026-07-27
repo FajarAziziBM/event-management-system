@@ -3,17 +3,24 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title><%= typeof title !== 'undefined' ? title + ' · Event Management System' : 'Event Management System' %></title>
+    <title><%= typeof title !== 'undefined' && title ? title + ' · EventHub' : 'EventHub - Platform Event Terbaik' %></title>
+    <meta name="description" content="EventHub — temukan dan ikuti event menarik, atau buat event Anda sendiri." />
+    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <% if (typeof extraHead !=='undefined' ) { %> <%- extraHead %> <% } %>
   </head>
-  <body>
+  <body class="bg-gray-50 min-h-screen flex flex-col">
     <%- include('../partials/navbar') %>
-    <%- include('../partials/header') %>
 
-    <main class="container">
-      <%- include('../partials/flash') %> <%- body %>
+    <div class="flash-container fixed top-20 right-4 z-50 w-full max-w-sm space-y-2 px-4 sm:px-0">
+      <%- include('../partials/flash') %>
+    </div>
+
+    <main class="flex-1">
+      <%- body %>
     </main>
 
-    <%- include('../partials/footer') %>
+    <%- include('../partials/site-footer') %>
   </body>
 </html>

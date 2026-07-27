@@ -2,6 +2,9 @@
 'use strict';
 
 const AuthService = require('../../services/auth.service');
+const UserService = require('../../services/user.service');
+const OrderService = require('../../services/order.service');
+const EventService = require('../../services/event.service');
 const { setFlash } = require('../../utils/flash');
 
 class AuthWebController {
@@ -14,11 +17,15 @@ class AuthWebController {
 
   /**
    * POST /auth/register — proses registrasi, redirect ke login dengan flash
+   * Catatan: role di-whitelist ke 'customer'/'organizer' saja — AuthService.register
+   * sendiri tidak membatasi role apa yang boleh dikirim, jadi penjagaan dilakukan
+   * di sini supaya form register tidak bisa dipakai untuk membuat akun admin.
    */
   static async postRegister(req, res, _next) {
     try {
       const { name, email, password } = req.body;
-      await AuthService.register(name, email, password);
+      const role = req.body.role === 'organizer' ? 'organizer' : 'customer';
+      await AuthService.register(name, email, password, role);
 
       setFlash(res, 'success', 'Registrasi berhasil! Silakan login dengan akun Anda.');
       res.redirect('/auth/login');
@@ -38,7 +45,15 @@ class AuthWebController {
     if (req.user) {
       return res.redirect('/');
     }
-    res.render('auth/login', { title: 'Masuk' });
+    res.render('auth/login', { title: 'Masuk', redirect: req.query.redirect || '' });
+  }
+
+  /** Hanya izinkan redirect ke path relatif sendiri (cegah open-redirect). */
+  static _safeRedirect(target) {
+    if (typeof target === 'string' && target.startsWith('/') && !target.startsWith('//')) {
+      return target;
+    }
+    return '/';
   }
 
   /**
@@ -58,7 +73,7 @@ class AuthWebController {
       });
 
       setFlash(res, 'success', `Selamat datang kembali, ${user.name}!`);
-      res.redirect('/');
+      res.redirect(AuthWebController._safeRedirect(req.body.redirect));
     } catch (err) {
       setFlash(res, 'error', err.message || 'Email atau password salah');
       res.redirect('/auth/login');
@@ -126,10 +141,74 @@ class AuthWebController {
   }
 
   /**
-   * GET /auth/profile — halaman profil (belum dibuat di epic ini, jatuh ke epic user)
+   * GET /auth/profile — halaman profil, dengan ringkasan statistik ringan
+   * (jumlah pesanan untuk semua role, jumlah event untuk organizer/admin).
    */
-  static getProfile(req, res) {
-    res.render('auth/profile', { title: 'Profil Saya', user: req.user });
+  static async getProfile(req, res, next) {
+    try {
+      const [profileUser, { pagination: orderStats }] = await Promise.all([
+        UserService.getUserById(req.user.id),
+        OrderService.listMyOrders(req.user.id, { limit: 1 }),
+      ]);
+      let eventStats = null;
+      if (req.user.role === 'organizer' || req.user.role === 'admin') {
+        const { pagination } = await EventService.listEventsByCreator(req.user.id, { limit: 1 });
+        eventStats = pagination.totalItems;
+      }
+
+      res.render('users/profile', {
+        title: 'Profil Saya',
+        profileUser,
+        totalOrders: orderStats.totalItems,
+        totalEvents: eventStats,
+        errors: {},
+      });
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  /** POST /auth/profile — update nama & nomor telepon */
+  static async postProfile(req, res) {
+    try {
+      const name = (req.body.name || '').trim();
+      const phone = (req.body.phone || '').trim();
+
+      if (name.length < 2) {
+        setFlash(res, 'error', 'Nama minimal 2 karakter.');
+        return res.redirect('/auth/profile');
+      }
+
+      await AuthService.updateProfile(req.user.id, { name, phone: phone || null });
+      setFlash(res, 'success', 'Profil berhasil diperbarui.');
+      return res.redirect('/auth/profile');
+    } catch (err) {
+      setFlash(res, 'error', err.message || 'Gagal memperbarui profil');
+      return res.redirect('/auth/profile');
+    }
+  }
+
+  /** POST /auth/change-password */
+  static async postChangePassword(req, res) {
+    try {
+      const { oldPassword, newPassword, confirmPassword } = req.body;
+
+      if (!newPassword || newPassword.length < 8) {
+        setFlash(res, 'error', 'Password baru minimal 8 karakter.');
+        return res.redirect('/auth/profile');
+      }
+      if (newPassword !== confirmPassword) {
+        setFlash(res, 'error', 'Konfirmasi password baru tidak cocok.');
+        return res.redirect('/auth/profile');
+      }
+
+      await AuthService.changePassword(req.user.id, { oldPassword, newPassword });
+      setFlash(res, 'success', 'Password berhasil diubah.');
+      return res.redirect('/auth/profile');
+    } catch (err) {
+      setFlash(res, 'error', err.message || 'Gagal mengubah password');
+      return res.redirect('/auth/profile');
+    }
   }
 }
 

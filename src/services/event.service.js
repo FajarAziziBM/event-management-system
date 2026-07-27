@@ -150,6 +150,21 @@ class EventService {
   }
 
   /**
+   * Ambil satu event by ID untuk keperluan form edit organizer/admin (bukan
+   * publik) — melempar error yang sama dengan updateEvent/deleteEvent kalau
+   * event tidak ada atau bukan milik user ini, supaya form edit tidak pernah
+   * menampilkan event yang bukan haknya.
+   */
+  static async getEventForOwner(id, userId, userRole) {
+    const event = await db.Event.findByPk(id, { include: PUBLIC_EVENT_INCLUDE });
+    if (!event) {
+      throw new NotFoundError('Event tidak ditemukan');
+    }
+    this._assertOwnership(event, userId, userRole);
+    return event;
+  }
+
+  /**
    * EVT-03: Hapus event — hanya pemilik/admin. Tolak jika masih ada order (FK RESTRICT),
    * dan bersihkan file banner + lampiran fisik di disk sebelum menghapus record.
    */
@@ -310,6 +325,42 @@ class EventService {
       where,
       include: PUBLIC_EVENT_INCLUDE,
       order: [['eventDate', 'ASC']],
+      limit,
+      offset,
+    });
+
+    return {
+      events: rows,
+      pagination: {
+        page,
+        limit,
+        totalItems: count,
+        totalPages: Math.ceil(count / limit),
+      },
+    };
+  }
+
+  /**
+   * Daftar event milik seorang creator (dipakai halaman "Event Saya" organizer) —
+   * berbeda dari listPublicEvents karena mencakup SEMUA status (termasuk
+   * draft/closed/cancelled), bukan cuma 'published'. Tidak ada di spesifikasi
+   * asli sebagai endpoint API tersendiri, ditambahkan khusus untuk kebutuhan
+   * halaman web ini; ownership sudah otomatis terjamin lewat where creatorId.
+   */
+  static async listEventsByCreator(creatorId, filters = {}) {
+    const page = Math.max(parseInt(filters.page, 10) || 1, 1);
+    const limit = Math.min(Math.max(parseInt(filters.limit, 10) || 9, 1), 100);
+    const offset = (page - 1) * limit;
+
+    const where = { creatorId };
+    if (filters.status && ['draft', 'published', 'closed', 'cancelled'].includes(filters.status)) {
+      where.status = filters.status;
+    }
+
+    const { count, rows } = await db.Event.findAndCountAll({
+      where,
+      include: PUBLIC_EVENT_INCLUDE,
+      order: [['createdAt', 'DESC']],
       limit,
       offset,
     });

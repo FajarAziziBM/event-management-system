@@ -1,27 +1,45 @@
-<%# src/views/auth/login.ejs %>
-<section class="auth-container">
-  <div class="auth-card">
-    <h1>Masuk</h1>
+<div class="min-h-[80vh] flex items-center justify-center px-4 py-12 bg-gradient-to-br from-indigo-50 via-white to-purple-50">
+  <div class="w-full max-w-md">
+    <div class="text-center mb-8">
+      <a href="/" class="inline-flex items-center space-x-2">
+        <span class="w-10 h-10 rounded-lg bg-gradient-to-br from-indigo-600 to-purple-600 flex items-center justify-center text-white">
+          <i class="fas fa-ticket"></i>
+        </span>
+        <span class="text-2xl font-bold text-gray-900">Event<span class="text-indigo-600">Hub</span></span>
+      </a>
+    </div>
 
-    <form method="post" action="/auth/login" class="auth-form">
-      <div class="form-group">
-        <label for="email">Email</label>
-        <input type="email" id="email" name="email" required />
-      </div>
+    <div class="bg-white rounded-2xl shadow-xl border border-gray-100 p-8">
+      <h1 class="text-xl font-bold text-gray-900 mb-1">Masuk ke Akun Anda</h1>
+      <p class="text-gray-500 text-sm mb-6">Senang bertemu lagi! Masukkan detail akun Anda.</p>
 
-      <div class="form-group">
-        <label for="password">Password</label>
-        <input type="password" id="password" name="password" required />
-      </div>
+      <form method="POST" action="/auth/login" class="space-y-4">
+        <% if (typeof redirect !=='undefined' && redirect) { %>
+        <input type="hidden" name="redirect" value="<%= redirect %>" />
+        <% } %>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1.5">Email</label>
+          <div class="relative">
+            <i class="fas fa-envelope absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+            <input type="email" name="email" required autofocus class="w-full pl-11 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="nama@email.com" />
+          </div>
+        </div>
+        <div>
+          <div class="flex items-center justify-between mb-1.5">
+            <label class="block text-sm font-medium text-gray-700">Password</label>
+            <a href="/auth/forgot-password" class="text-sm text-indigo-600 hover:underline">Lupa password?</a>
+          </div>
+          <div class="relative">
+            <i class="fas fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+            <input type="password" name="password" required class="w-full pl-11 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="••••••••" />
+          </div>
+        </div>
+        <button type="submit" class="w-full bg-indigo-600 text-white py-3 rounded-xl font-semibold hover:bg-indigo-700 transition-colors">Masuk</button>
+      </form>
 
-      <button type="submit" class="btn btn--primary">Masuk</button>
-    </form>
-
-    <p class="auth-footer">
-      Belum punya akun? <a href="/auth/register">Daftar di sini</a>
-    </p>
-    <p class="auth-footer">
-      <a href="/auth/forgot-password">Lupa password?</a>
-    </p>
+      <p class="text-center text-sm text-gray-500 mt-6">
+        Belum punya akun? <a href="/auth/register" class="text-indigo-600 font-semibold hover:underline">Daftar sekarang</a>
+      </p>
+    </div>
   </div>
-</section>
+</div>

@@ -32,7 +32,7 @@ async function authenticate(req, res, next) {
     const decoded = AuthService.verifyAndDecodeToken(token);
 
     const user = await db.User.findByPk(decoded.id, {
-      attributes: ['id', 'email', 'role', 'isSuspended'],
+      attributes: ['id', 'name', 'email', 'role', 'isSuspended'],
     });
 
     if (!user) {
@@ -42,7 +42,7 @@ async function authenticate(req, res, next) {
       return next(new ForbiddenError('Akun Anda telah disuspend, hubungi admin'));
     }
 
-    req.user = { id: user.id, email: user.email, role: user.role };
+    req.user = { id: user.id, name: user.name, email: user.email, role: user.role };
     next();
   } catch (err) {
     next(err);
@@ -91,11 +91,11 @@ async function authenticateOptional(req, res, next) {
       const decoded = AuthService.verifyAndDecodeToken(token);
 
       const user = await db.User.findByPk(decoded.id, {
-        attributes: ['id', 'email', 'role', 'isSuspended'],
+        attributes: ['id', 'name', 'email', 'role', 'isSuspended'],
       });
 
       if (user && !user.isSuspended) {
-        req.user = { id: user.id, email: user.email, role: user.role };
+        req.user = { id: user.id, name: user.name, email: user.email, role: user.role };
       }
     } catch {
       // Token invalid, tapi jangan error — hanya anggap sebagai unauthenticated

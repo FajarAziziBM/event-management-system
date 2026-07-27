@@ -1,0 +1,112 @@
+<!-- Header pencarian -->
+<section class="bg-gradient-to-r from-indigo-600 to-purple-600 py-10">
+  <div class="max-w-7xl mx-auto px-4">
+    <h1 class="text-3xl font-bold text-white mb-6">Jelajahi Event</h1>
+    <form method="GET" action="/events" class="bg-white rounded-2xl shadow-lg p-4 grid grid-cols-1 md:grid-cols-4 gap-3">
+      <div class="md:col-span-2 relative">
+        <i class="fas fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+        <input
+          type="text"
+          name="q"
+          value="<%= filters.q || filters.search || '' %>"
+          placeholder="Cari nama event..."
+          class="w-full pl-11 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+        />
+      </div>
+      <div class="relative">
+        <i class="fas fa-location-dot absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+        <input
+          type="text"
+          name="location"
+          value="<%= filters.location || '' %>"
+          placeholder="Venue / lokasi"
+          class="w-full pl-11 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+        />
+      </div>
+      <button type="submit" class="bg-indigo-600 text-white rounded-xl font-semibold hover:bg-indigo-700 transition-colors flex items-center justify-center gap-2">
+        <i class="fas fa-magnifying-glass"></i> Cari
+      </button>
+    </form>
+
+    <!-- Filter kategori cepat -->
+    <div class="flex flex-wrap gap-2 mt-4">
+      <a
+        href="/events"
+        class="px-4 py-1.5 rounded-full text-sm font-medium transition-colors <%= !filters.category ? 'bg-white text-indigo-700' : 'bg-white/20 text-white hover:bg-white/30' %>"
+        >Semua</a
+      >
+      <% categories.forEach(function(cat) { %>
+      <a
+        href="/events?category=<%= cat.id %><%= filters.q ? '&q=' + encodeURIComponent(filters.q) : '' %>"
+        class="px-4 py-1.5 rounded-full text-sm font-medium transition-colors <%= String(filters.category)===String(cat.id) ? 'bg-white text-indigo-700' : 'bg-white/20 text-white hover:bg-white/30' %>"
+      >
+        <i class="fas fa-<%= cat.icon || 'tag' %> mr-1"></i><%= cat.name %>
+      </a>
+      <% }); %>
+    </div>
+  </div>
+</section>
+
+<section class="max-w-7xl mx-auto px-4 py-10">
+  <div class="flex items-center justify-between mb-6">
+    <p class="text-gray-600"><%= pagination.totalItems %> event ditemukan</p>
+  </div>
+
+  <% if (events.length===0) { %>
+  <div class="text-center py-20">
+    <div class="w-20 h-20 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
+      <i class="fas fa-calendar-xmark text-gray-400 text-3xl"></i>
+    </div>
+    <h3 class="text-lg font-semibold text-gray-900 mb-1">Tidak ada event ditemukan</h3>
+    <p class="text-gray-500 mb-6">Coba ubah kata kunci pencarian atau filter kategori.</p>
+    <a href="/events" class="text-indigo-600 font-semibold hover:underline">Reset pencarian</a>
+  </div>
+  <% } else { %>
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    <% events.forEach(function(event) { %>
+    <a href="/events/<%= event.slug %>" class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-xl transition-shadow group">
+      <div class="h-44 relative overflow-hidden bg-gradient-to-br from-indigo-500 to-purple-600">
+        <% if (event.imagePath) { %>
+        <img src="<%= assetUrl(event.imagePath) %>" alt="<%= event.title %>" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+        <% } else { %>
+        <div class="w-full h-full flex items-center justify-center">
+          <i class="fas fa-<%= event.category ? event.category.icon : 'calendar-days' %> text-white/70 text-5xl"></i>
+        </div>
+        <% } %>
+        <span class="absolute top-3 left-3 bg-white/95 text-indigo-700 text-xs font-semibold px-3 py-1 rounded-full">
+          <i class="fas fa-<%= event.category ? event.category.icon : 'tag' %> mr-1"></i><%= event.category ? event.category.name : 'Umum' %>
+        </span>
+        <% if (event.availableTicket <=0) { %>
+        <span class="absolute top-3 right-3 bg-red-600 text-white text-xs font-semibold px-3 py-1 rounded-full">Tiket Habis</span>
+        <% } %>
+      </div>
+      <div class="p-5">
+        <p class="text-indigo-600 text-sm font-semibold mb-1">
+          <i class="fas fa-calendar-day mr-1"></i><%= formatDate(event.eventDate) %>
+        </p>
+        <h3 class="font-bold text-gray-900 mb-2 line-clamp-2 group-hover:text-indigo-600 transition-colors"><%= event.title %></h3>
+        <p class="text-gray-500 text-sm mb-4 line-clamp-1"><i class="fas fa-location-dot mr-1"></i><%= event.venue %></p>
+        <div class="flex items-center justify-between">
+          <span class="font-bold text-gray-900">
+            <% if (Number(event.ticketPrice)===0) { %>Gratis<% } else { %><%= formatCurrency(event.ticketPrice) %><% } %>
+          </span>
+          <span class="text-indigo-600 text-sm font-semibold group-hover:underline">Lihat Detail →</span>
+        </div>
+      </div>
+    </a>
+    <% }); %>
+  </div>
+
+  <!-- Pagination -->
+  <% if (pagination.totalPages > 1) { %>
+  <div class="flex items-center justify-center gap-2 mt-10">
+    <% for (let p=1; p <=pagination.totalPages; p++) { %>
+    <a
+      href="/events?page=<%= p %><%= filters.q ? '&q=' + encodeURIComponent(filters.q) : '' %><%= filters.category ? '&category=' + filters.category : '' %><%= filters.location ? '&location=' + encodeURIComponent(filters.location) : '' %>"
+      class="w-10 h-10 flex items-center justify-center rounded-lg font-medium transition-colors <%= p===pagination.page ? 'bg-indigo-600 text-white' : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50' %>"
+      ><%= p %></a
+    >
+    <% } %>
+  </div>
+  <% } %> <% } %>
+</section>
