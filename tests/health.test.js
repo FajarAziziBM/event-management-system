@@ -17,8 +17,8 @@ describe('GET / (halaman beranda)', () => {
   it('merender layout + partial dengan benar', async () => {
     const res = await request(app).get('/');
     expect(res.status).toBe(200);
-    expect(res.text).toContain('Event Management System');
-    expect(res.text).toContain('Jelajahi Event');
+    expect(res.text).toContain('EventHub');
+    expect(res.text).toContain('Event Terdekat');
   });
 });
 

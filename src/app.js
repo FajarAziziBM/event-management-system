@@ -41,6 +41,35 @@ const { authenticateOptional } = require('./middlewares/auth.middleware');
 app.use(authenticateOptional);
 app.use((req, res, next) => {
   res.locals.user = req.user || null;
+  // File-file (banner event, dll) disimpan sebagai path relatif disk
+  // (mis. 'src/public/uploads/...'); helper ini menyederhanakannya jadi URL
+  // yang bisa langsung dipakai di <img src="...">, karena src/public sendiri
+  // sudah di-serve sebagai root statis di atas.
+  res.locals.assetUrl = (relPath) =>
+    relPath ? `/${relPath.replace(/^src[\\/]public[\\/]?/, '')}` : null;
+
+  // Helper format Rupiah & tanggal Indonesia — dipakai di banyak view (events, orders, tickets)
+  res.locals.formatCurrency = (amount) =>
+    new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(
+      Number(amount) || 0,
+    );
+  res.locals.formatDate = (date) =>
+    date
+      ? new Intl.DateTimeFormat('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }).format(
+          new Date(date),
+        )
+      : '-';
+  res.locals.formatDateTime = (date) =>
+    date
+      ? `${new Intl.DateTimeFormat('id-ID', {
+          day: 'numeric',
+          month: 'long',
+          year: 'numeric',
+        }).format(new Date(date))}, ${new Intl.DateTimeFormat('id-ID', {
+          hour: '2-digit',
+          minute: '2-digit',
+        }).format(new Date(date))} WIB`
+      : '-';
   next();
 });
 app.use(flashMiddleware);

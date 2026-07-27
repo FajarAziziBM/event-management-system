@@ -1,0 +1,60 @@
+<div class="max-w-4xl mx-auto px-4 py-10">
+  <h1 class="text-2xl font-bold text-gray-900 mb-8">Pesanan Saya</h1>
+
+  <% if (orders.length===0) { %>
+  <div class="text-center py-20 bg-white rounded-2xl border border-gray-100">
+    <div class="w-20 h-20 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
+      <i class="fas fa-receipt text-gray-400 text-3xl"></i>
+    </div>
+    <h3 class="text-lg font-semibold text-gray-900 mb-1">Belum ada pesanan</h3>
+    <p class="text-gray-500 mb-6">Yuk jelajahi event menarik dan pesan tiketmu.</p>
+    <a href="/events" class="bg-indigo-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-indigo-700 transition-colors inline-flex items-center gap-2">
+      <i class="fas fa-magnifying-glass"></i> Jelajahi Event
+    </a>
+  </div>
+  <% } else { %>
+  <div class="space-y-4">
+    <% orders.forEach(function(order) { %>
+    <div class="bg-white rounded-2xl border border-gray-100 p-5 flex flex-col sm:flex-row sm:items-center gap-4">
+      <div class="flex-1 min-w-0">
+        <div class="flex items-center gap-2 mb-1 flex-wrap">
+          <span class="text-xs font-mono text-gray-400"><%= order.orderNumber %></span>
+          <% if (order.paymentStatus==='paid' ) { %>
+          <span class="bg-green-100 text-green-700 text-xs font-semibold px-2.5 py-0.5 rounded-full">Lunas</span>
+          <% } else if (order.paymentStatus==='pending' ) { %>
+          <span class="bg-yellow-100 text-yellow-700 text-xs font-semibold px-2.5 py-0.5 rounded-full">Menunggu Pembayaran</span>
+          <% } else if (order.paymentStatus==='expired' ) { %>
+          <span class="bg-red-100 text-red-700 text-xs font-semibold px-2.5 py-0.5 rounded-full">Kedaluwarsa</span>
+          <% } else if (order.paymentStatus==='cancelled' ) { %>
+          <span class="bg-gray-100 text-gray-600 text-xs font-semibold px-2.5 py-0.5 rounded-full">Dibatalkan</span>
+          <% } else if (order.paymentStatus==='refunded' ) { %>
+          <span class="bg-blue-100 text-blue-700 text-xs font-semibold px-2.5 py-0.5 rounded-full">Refund</span>
+          <% } %>
+        </div>
+        <h3 class="font-bold text-gray-900 line-clamp-1"><%= order.event ? order.event.title : 'Event tidak tersedia' %></h3>
+        <p class="text-gray-500 text-sm mt-1">
+          <i class="fas fa-ticket mr-1"></i><%= order.quantity %> tiket &middot; <%= formatCurrency(order.totalAmount) %>
+        </p>
+      </div>
+      <div class="flex items-center gap-2 shrink-0">
+        <% if (order.paymentStatus==='pending' && order.payment && order.payment.paymentUrl) { %>
+        <a href="<%= order.payment.paymentUrl %>" class="bg-indigo-600 text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-indigo-700 transition-colors whitespace-nowrap">Bayar Sekarang</a>
+        <% } %>
+        <a href="/orders/<%= order.id %>" class="border border-gray-200 text-gray-700 px-4 py-2 rounded-xl text-sm font-semibold hover:bg-gray-50 transition-colors whitespace-nowrap">Detail</a>
+      </div>
+    </div>
+    <% }); %>
+  </div>
+
+  <% if (pagination.totalPages > 1) { %>
+  <div class="flex items-center justify-center gap-2 mt-10">
+    <% for (let p=1; p <=pagination.totalPages; p++) { %>
+    <a
+      href="/orders?page=<%= p %>"
+      class="w-10 h-10 flex items-center justify-center rounded-lg font-medium <%= p===pagination.page ? 'bg-indigo-600 text-white' : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50' %>"
+      ><%= p %></a
+    >
+    <% } %>
+  </div>
+  <% } %> <% } %>
+</div>

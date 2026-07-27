@@ -1,0 +1,83 @@
+<div class="max-w-3xl mx-auto px-4 py-10">
+  <div class="mb-8 flex items-start justify-between flex-wrap gap-3">
+    <div>
+      <a href="/my-events" class="text-indigo-600 text-sm font-medium hover:underline mb-2 inline-block"><i class="fas fa-arrow-left mr-1"></i>Kembali ke Event Saya</a>
+      <h1 class="text-2xl font-bold text-gray-900">Edit Event</h1>
+      <span
+        class="inline-block mt-2 text-xs font-semibold px-3 py-1 rounded-full capitalize <%= event.status==='published' ? 'bg-green-100 text-green-700' : (event.status==='draft' ? 'bg-gray-100 text-gray-600' : (event.status==='cancelled' ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700')) %>"
+        ><%= event.status %></span
+      >
+    </div>
+    <a href="/events/<%= event.slug %>" target="_blank" rel="noopener" class="text-sm text-gray-500 hover:text-indigo-600 flex items-center gap-1">
+      <i class="fas fa-arrow-up-right-from-square"></i> Lihat halaman publik
+    </a>
+  </div>
+
+  <!-- Aksi status -->
+  <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 mb-6 flex flex-wrap gap-3">
+    <% if (event.status==='draft' ) { %>
+    <form method="POST" action="/events/<%= event.id %>/publish">
+      <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-green-700 transition-colors flex items-center gap-2">
+        <i class="fas fa-bullhorn"></i> Publikasikan Event
+      </button>
+    </form>
+    <% } else if (event.status==='published' ) { %>
+    <form method="POST" action="/events/<%= event.id %>/unpublish" onsubmit="return document.getElementById('target-draft').value='draft';">
+      <input type="hidden" name="targetStatus" id="target-draft" value="draft" />
+      <button type="submit" class="bg-gray-100 text-gray-700 px-4 py-2 rounded-xl text-sm font-semibold hover:bg-gray-200 transition-colors flex items-center gap-2">
+        <i class="fas fa-eye-slash"></i> Tarik ke Draft
+      </button>
+    </form>
+    <form method="POST" action="/events/<%= event.id %>/unpublish">
+      <input type="hidden" name="targetStatus" value="closed" />
+      <button type="submit" class="bg-yellow-100 text-yellow-700 px-4 py-2 rounded-xl text-sm font-semibold hover:bg-yellow-200 transition-colors flex items-center gap-2">
+        <i class="fas fa-lock"></i> Tutup Pendaftaran
+      </button>
+    </form>
+    <form method="POST" action="/events/<%= event.id %>/unpublish" onsubmit="return confirm('Yakin batalkan event ini? Seluruh pemegang tiket akan diberi notifikasi.');">
+      <input type="hidden" name="targetStatus" value="cancelled" />
+      <button type="submit" class="bg-red-50 text-red-700 px-4 py-2 rounded-xl text-sm font-semibold hover:bg-red-100 transition-colors flex items-center gap-2">
+        <i class="fas fa-ban"></i> Batalkan Event
+      </button>
+    </form>
+    <% } %>
+    <form method="POST" action="/events/<%= event.id %>/delete" onsubmit="return confirm('Hapus event ini secara permanen? Tindakan ini tidak bisa dibatalkan.');" class="ml-auto">
+      <button type="submit" class="text-red-600 px-4 py-2 rounded-xl text-sm font-semibold hover:bg-red-50 transition-colors flex items-center gap-2">
+        <i class="fas fa-trash"></i> Hapus Event
+      </button>
+    </form>
+  </div>
+
+  <form method="POST" action="/events/<%= event.id %>/edit" enctype="multipart/form-data" class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 md:p-8">
+    <!-- Banner -->
+    <div class="mb-8">
+      <label class="block text-sm font-medium text-gray-700 mb-2">Banner Event</label>
+      <div class="rounded-xl overflow-hidden bg-gray-100 h-48 flex items-center justify-center mb-3">
+        <% if (event.imagePath) { %>
+        <img src="<%= assetUrl(event.imagePath) %>" alt="Banner" class="w-full h-full object-cover" />
+        <% } else { %>
+        <div class="text-gray-400 text-center">
+          <i class="fas fa-image text-3xl mb-1"></i>
+          <p class="text-sm">Belum ada banner</p>
+        </div>
+        <% } %>
+      </div>
+      <input
+        type="file"
+        name="banner"
+        accept="image/jpeg,image/png,image/webp"
+        class="w-full text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:bg-indigo-50 file:text-indigo-700 file:font-semibold hover:file:bg-indigo-100"
+      />
+      <p class="text-xs text-gray-400 mt-1">JPG, PNG, atau WEBP. Kosongkan jika tidak ingin mengganti banner.</p>
+    </div>
+
+    <%- include('_form-fields', { values, errors, categories }) %>
+
+    <div class="flex items-center justify-end gap-3 mt-8 pt-6 border-t border-gray-100">
+      <a href="/my-events" class="px-6 py-3 rounded-xl font-semibold text-gray-600 hover:bg-gray-50 transition-colors">Batal</a>
+      <button type="submit" class="bg-indigo-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-indigo-700 transition-colors flex items-center gap-2">
+        <i class="fas fa-floppy-disk"></i> Simpan Perubahan
+      </button>
+    </div>
+  </form>
+</div>

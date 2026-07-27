@@ -1,3 +1,24 @@
 <% if (typeof flash !=='undefined' && flash) { %>
-<div class="alert alert--<%= flash.type %>"><%= flash.message %></div>
+<div
+  class="flash-toast rounded-xl shadow-lg border px-4 py-3 flex items-start gap-3 <%= flash.type==='success' ? 'bg-green-50 border-green-200 text-green-800' : 'bg-red-50 border-red-200 text-red-800' %>"
+  role="alert"
+>
+  <i class="fas <%= flash.type==='success' ? 'fa-circle-check text-green-500' : 'fa-circle-exclamation text-red-500' %> mt-0.5"></i>
+  <p class="text-sm font-medium flex-1"><%= flash.message %></p>
+  <button type="button" onclick="this.closest('.flash-toast').remove()" class="text-current opacity-60 hover:opacity-100" aria-label="Tutup">
+    <i class="fas fa-xmark"></i>
+  </button>
+</div>
+<script>
+  (function () {
+    var toasts = document.querySelectorAll('.flash-toast');
+    toasts.forEach(function (el) {
+      setTimeout(function () {
+        el.style.transition = 'opacity .3s ease';
+        el.style.opacity = '0';
+        setTimeout(function () { el.remove(); }, 300);
+      }, 5000);
+    });
+  })();
+</script>
 <% } %>

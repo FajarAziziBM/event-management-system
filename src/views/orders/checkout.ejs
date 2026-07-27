@@ -1,0 +1,102 @@
+<div class="max-w-3xl mx-auto px-4 py-10">
+  <h1 class="text-2xl font-bold text-gray-900 mb-8">Checkout</h1>
+
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+    <div class="md:col-span-2 space-y-6">
+      <!-- Ringkasan event -->
+      <div class="bg-white rounded-2xl border border-gray-100 p-5 flex gap-4">
+        <div class="w-24 h-24 rounded-xl overflow-hidden bg-gradient-to-br from-indigo-500 to-purple-600 shrink-0">
+          <% if (event.imagePath) { %>
+          <img src="<%= assetUrl(event.imagePath) %>" alt="<%= event.title %>" class="w-full h-full object-cover" />
+          <% } else { %>
+          <div class="w-full h-full flex items-center justify-center">
+            <i class="fas fa-<%= event.category ? event.category.icon : 'calendar-days' %> text-white/70 text-2xl"></i>
+          </div>
+          <% } %>
+        </div>
+        <div class="min-w-0">
+          <h3 class="font-bold text-gray-900 line-clamp-2"><%= event.title %></h3>
+          <p class="text-gray-500 text-sm mt-1"><i class="fas fa-calendar-day mr-1"></i><%= formatDateTime(event.eventDate) %></p>
+          <p class="text-gray-500 text-sm"><i class="fas fa-location-dot mr-1"></i><%= event.venue %></p>
+        </div>
+      </div>
+
+      <!-- Info penerima tiket -->
+      <div class="bg-white rounded-2xl border border-gray-100 p-5">
+        <h3 class="font-semibold text-gray-900 mb-3"><i class="fas fa-user mr-2 text-indigo-600"></i>Tiket Akan Diterbitkan Atas Nama</h3>
+        <p class="text-gray-700 text-sm"><%= user.name %></p>
+        <p class="text-gray-500 text-sm"><%= user.email %></p>
+        <p class="text-xs text-gray-400 mt-2">Seluruh tiket dalam pesanan ini akan tercatat atas nama akun Anda. Untuk mengubah nama/email, perbarui dulu di halaman <a href="/auth/profile" class="text-indigo-600 hover:underline">Profil</a>.</p>
+      </div>
+
+      <form method="POST" action="/orders" id="checkout-form">
+        <input type="hidden" name="eventId" value="<%= event.id %>" />
+        <div class="bg-white rounded-2xl border border-gray-100 p-5">
+          <label class="block text-sm font-medium text-gray-700 mb-2">Jumlah Tiket</label>
+          <select name="quantity" id="quantity-select" class="w-full border border-gray-200 rounded-xl px-4 py-3 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+            <% for (let q=1; q <=Math.min(event.availableTicket, 10); q++) { %>
+            <option value="<%= q %>" <%= q===quantity ? 'selected' : '' %>><%= q %> tiket</option>
+            <% } %>
+          </select>
+        </div>
+
+        <label class="flex items-start gap-2 mt-5 text-sm text-gray-600">
+          <input type="checkbox" name="agree" value="1" class="mt-1 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500" />
+          <span>Saya menyetujui <a href="/terms" target="_blank" class="text-indigo-600 hover:underline">Syarat &amp; Ketentuan</a> dan <a href="/privacy" target="_blank" class="text-indigo-600 hover:underline">Kebijakan Privasi</a> EventHub.</span>
+        </label>
+
+        <button type="submit" class="w-full mt-6 bg-indigo-600 text-white py-3.5 rounded-xl font-semibold hover:bg-indigo-700 transition-colors flex items-center justify-center gap-2">
+          <i class="fas fa-lock"></i> Lanjutkan ke Pembayaran
+        </button>
+        <p class="text-center text-xs text-gray-400 mt-3">
+          <i class="fas fa-circle-info mr-1"></i>Pesanan akan kedaluwarsa dalam <%= expiryMinutes %> menit jika belum dibayar.
+        </p>
+      </form>
+    </div>
+
+    <!-- Ringkasan harga -->
+    <div>
+      <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 sticky top-24">
+        <h3 class="font-bold text-gray-900 mb-4">Ringkasan Pembayaran</h3>
+        <div class="space-y-2 text-sm" id="price-summary">
+          <div class="flex justify-between text-gray-600">
+            <span>Harga Tiket x <span id="qty-label"><%= quantity %></span></span>
+            <span id="subtotal-label"><%= formatCurrency(subtotal) %></span>
+          </div>
+          <div class="flex justify-between text-gray-600">
+            <span>Biaya Layanan (<%= serviceFeePercentage %>%)</span>
+            <span id="fee-label"><%= formatCurrency(serviceFee) %></span>
+          </div>
+          <div class="border-t border-gray-100 pt-3 mt-3 flex justify-between font-bold text-gray-900 text-base">
+            <span>Total</span>
+            <span id="total-label"><%= formatCurrency(totalAmount) %></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Update ringkasan harga secara live saat jumlah tiket diubah (tanpa reload) —
+  // murni tampilan; perhitungan final & otoritatif tetap dilakukan di server saat submit.
+  (function () {
+    var select = document.getElementById('quantity-select');
+    var unitPrice = <%= JSON.stringify(Number(event.ticketPrice)) %>;
+    var feePct = <%= serviceFeePercentage %>;
+    var formatter = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 });
+
+    if (select) {
+      select.addEventListener('change', function () {
+        var qty = parseInt(this.value, 10);
+        var subtotal = unitPrice * qty;
+        var fee = Math.round(subtotal * (feePct / 100));
+        var total = subtotal + fee;
+        document.getElementById('qty-label').textContent = qty;
+        document.getElementById('subtotal-label').textContent = formatter.format(subtotal);
+        document.getElementById('fee-label').textContent = formatter.format(fee);
+        document.getElementById('total-label').textContent = formatter.format(total);
+      });
+    }
+  })();
+</script>
