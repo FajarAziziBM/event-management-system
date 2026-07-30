@@ -6,6 +6,7 @@
   </div>
 
   <form method="POST" action="/events/create" class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 md:p-8">
+    <%- include('../partials/csrf-field') %>
     <%- include('_form-fields', { values, errors, categories }) %>
 
     <div class="flex items-center justify-end gap-3 mt-8 pt-6 border-t border-gray-100">

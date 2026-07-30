@@ -43,7 +43,8 @@
     <div class="bg-yellow-50 border border-yellow-200 rounded-xl p-4 flex flex-col sm:flex-row sm:items-center gap-3 justify-between" id="pending-box" data-order-id="<%= order.id %>">
       <p class="text-yellow-800 text-sm"><i class="fas fa-clock mr-1"></i>Selesaikan pembayaran sebelum <%= formatDateTime(order.expiredAt) %>.</p>
       <div class="flex gap-2 shrink-0">
-        <form method="POST" action="/orders/<%= order.id %>/cancel" onsubmit="return confirm('Batalkan pesanan ini?');">
+        <form method="POST" action="/orders/<%= order.id %>/cancel" class="js-confirm-submit" data-confirm-message="Batalkan pesanan ini?">
+          <%- include('../partials/csrf-field') %>
           <button type="submit" class="border border-gray-300 text-gray-600 px-4 py-2 rounded-xl text-sm font-semibold hover:bg-gray-50 transition-colors">Batalkan</button>
         </form>
         <% if (paymentUrl) { %>
@@ -51,7 +52,7 @@
         <% } %>
       </div>
     </div>
-    <script>
+    <script nonce="<%= cspNonce %>">
       // Polling ringan: kalau pembayaran selesai di tab lain, refresh otomatis biar status ter-update
       (function () {
         var box = document.getElementById('pending-box');

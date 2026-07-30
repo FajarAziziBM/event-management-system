@@ -5,6 +5,7 @@ const express = require('express');
 
 const AuthController = require('../../../controllers/api/v1/auth.controller');
 const { authenticate } = require('../../../middlewares/auth.middleware');
+const { authLimiter } = require('../../../middlewares/rateLimiter.middleware');
 const {
   validateRegister,
   validateLogin,
@@ -17,11 +18,11 @@ const {
 const router = express.Router();
 
 // Public routes (tidak perlu login)
-router.post('/register', validateRegister, AuthController.register);
-router.post('/login', validateLogin, AuthController.login);
+router.post('/register', authLimiter, validateRegister, AuthController.register);
+router.post('/login', authLimiter, validateLogin, AuthController.login);
 router.post('/logout', AuthController.logout);
-router.post('/forgot-password', validateForgotPassword, AuthController.forgotPassword);
-router.post('/reset-password', validateResetPassword, AuthController.resetPassword);
+router.post('/forgot-password', authLimiter, validateForgotPassword, AuthController.forgotPassword);
+router.post('/reset-password', authLimiter, validateResetPassword, AuthController.resetPassword);
 
 // Protected routes (perlu login)
 router.get('/me', authenticate, AuthController.getMe);
@@ -29,6 +30,7 @@ router.patch('/profile', authenticate, validateUpdateProfile, AuthController.upd
 router.patch(
   '/change-password',
   authenticate,
+  authLimiter,
   validateChangePassword,
   AuthController.changePassword,
 );

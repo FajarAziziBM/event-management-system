@@ -8,8 +8,15 @@ const eventsRoutes = require('./events');
 const ordersRoutes = require('./orders');
 const ticketsRoutes = require('./tickets');
 const HomeWebController = require('../../controllers/web/home.controller');
+const { attachCsrfToken } = require('../../middlewares/csrf.middleware');
 
 const router = express.Router();
+
+// SEC-06: isi res.locals.csrfToken di SETIAP rute web (bukan /api/v1 atau
+// webhook — keduanya tidak pakai form EJS, jadi sengaja tidak dibebani
+// dependency ke CSRF_SECRET). Form mana pun tinggal:
+// <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+router.use(attachCsrfToken);
 
 router.use('/auth', authRoutes);
 router.use(eventsRoutes);

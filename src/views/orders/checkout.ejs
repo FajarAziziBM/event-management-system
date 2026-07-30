@@ -30,6 +30,7 @@
       </div>
 
       <form method="POST" action="/orders" id="checkout-form">
+        <%- include('../partials/csrf-field') %>
         <input type="hidden" name="eventId" value="<%= event.id %>" />
         <div class="bg-white rounded-2xl border border-gray-100 p-5">
           <label class="block text-sm font-medium text-gray-700 mb-2">Jumlah Tiket</label>
@@ -77,7 +78,7 @@
   </div>
 </div>
 
-<script>
+<script nonce="<%= cspNonce %>">
   // Update ringkasan harga secara live saat jumlah tiket diubah (tanpa reload) —
   // murni tampilan; perhitungan final & otoritatif tetap dilakukan di server saat submit.
   (function () {

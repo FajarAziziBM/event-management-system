@@ -106,8 +106,7 @@ const EventWebController = {
     try {
       const event = await EventService.getEventBySlug(req.params.slug, req.user);
       const isOwner =
-        req.user &&
-        (req.user.role === 'admin' || String(event.creatorId) === String(req.user.id));
+        req.user && (req.user.role === 'admin' || String(event.creatorId) === String(req.user.id));
 
       res.render('events/detail', {
         title: event.title,
@@ -172,7 +171,11 @@ const EventWebController = {
       }
 
       const event = await EventService.createEvent(req.user.id, data);
-      setFlash(res, 'success', 'Event berhasil dibuat sebagai draft. Yuk lengkapi banner-nya di bawah, lalu publikasikan kalau sudah siap.');
+      setFlash(
+        res,
+        'success',
+        'Event berhasil dibuat sebagai draft. Yuk lengkapi banner-nya di bawah, lalu publikasikan kalau sudah siap.',
+      );
       return res.redirect(`/events/${event.id}/edit`);
     } catch (err) {
       try {
@@ -276,12 +279,10 @@ const EventWebController = {
     res.redirect('/my-events');
   },
 
-  /** POST /events/:id/unpublish — targetStatus: draft | closed | cancelled */
+  /** POST /events/:id/unpublish — targetStatus: draft | closed | cancelled (divalidasi di routes) */
   async unpublish(req, res, next) {
     try {
-      const targetStatus = ['draft', 'closed', 'cancelled'].includes(req.body.targetStatus)
-        ? req.body.targetStatus
-        : 'draft';
+      const targetStatus = req.body.targetStatus || 'draft';
       await EventService.unpublishEvent(req.params.id, req.user.id, req.user.role, targetStatus);
       const messages = {
         draft: 'Event ditarik kembali ke draft.',

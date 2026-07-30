@@ -75,6 +75,7 @@ class AuthService {
     // Generate reset token (berlaku 1 jam)
     const resetToken = jwt.sign({ userId: user.id, type: 'reset' }, config.auth.jwtSecret, {
       expiresIn: '1h',
+      algorithm: 'HS256',
     });
 
     // Melengkapi TODO sebelumnya (sekarang Epic NOTIF sudah selesai)
@@ -90,7 +91,7 @@ class AuthService {
     let decoded;
 
     try {
-      decoded = jwt.verify(token, config.auth.jwtSecret);
+      decoded = jwt.verify(token, config.auth.jwtSecret, { algorithms: ['HS256'] });
     } catch {
       throw new UnauthorizedError('Token reset password tidak valid atau sudah expired');
     }
@@ -116,7 +117,7 @@ class AuthService {
    */
   static verifyAndDecodeToken(token) {
     try {
-      const decoded = jwt.verify(token, config.auth.jwtSecret);
+      const decoded = jwt.verify(token, config.auth.jwtSecret, { algorithms: ['HS256'] });
       return decoded;
     } catch {
       throw new UnauthorizedError('Token tidak valid atau sudah expired');
@@ -134,7 +135,7 @@ class AuthService {
         role: user.role,
       },
       config.auth.jwtSecret,
-      { expiresIn: config.auth.jwtExpiresIn },
+      { expiresIn: config.auth.jwtExpiresIn, algorithm: 'HS256' },
     );
   }
 

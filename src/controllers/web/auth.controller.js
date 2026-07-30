@@ -5,6 +5,7 @@ const AuthService = require('../../services/auth.service');
 const UserService = require('../../services/user.service');
 const OrderService = require('../../services/order.service');
 const EventService = require('../../services/event.service');
+const config = require('../../config/env');
 const { setFlash } = require('../../utils/flash');
 
 class AuthWebController {
@@ -67,7 +68,7 @@ class AuthWebController {
       // Set token ke httpOnly cookie
       res.cookie('token', token, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
+        secure: config.auth.cookieSecure,
         sameSite: 'strict',
         maxAge: 24 * 60 * 60 * 1000,
       });
@@ -168,18 +169,16 @@ class AuthWebController {
     }
   }
 
-  /** POST /auth/profile — update nama & nomor telepon */
+  /** POST /auth/profile — update nama & nomor telepon (validasi: lihat validateUpdateProfile di routes) */
   static async postProfile(req, res) {
     try {
       const name = (req.body.name || '').trim();
       const phone = (req.body.phone || '').trim();
 
-      if (name.length < 2) {
-        setFlash(res, 'error', 'Nama minimal 2 karakter.');
-        return res.redirect('/auth/profile');
-      }
-
-      await AuthService.updateProfile(req.user.id, { name, phone: phone || null });
+      await AuthService.updateProfile(req.user.id, {
+        name: name || undefined,
+        phone: phone || null,
+      });
       setFlash(res, 'success', 'Profil berhasil diperbarui.');
       return res.redirect('/auth/profile');
     } catch (err) {
@@ -188,19 +187,10 @@ class AuthWebController {
     }
   }
 
-  /** POST /auth/change-password */
+  /** POST /auth/change-password (validasi: lihat validateChangePassword di routes) */
   static async postChangePassword(req, res) {
     try {
-      const { oldPassword, newPassword, confirmPassword } = req.body;
-
-      if (!newPassword || newPassword.length < 8) {
-        setFlash(res, 'error', 'Password baru minimal 8 karakter.');
-        return res.redirect('/auth/profile');
-      }
-      if (newPassword !== confirmPassword) {
-        setFlash(res, 'error', 'Konfirmasi password baru tidak cocok.');
-        return res.redirect('/auth/profile');
-      }
+      const { oldPassword, newPassword } = req.body;
 
       await AuthService.changePassword(req.user.id, { oldPassword, newPassword });
       setFlash(res, 'success', 'Password berhasil diubah.');
