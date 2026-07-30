@@ -22,5 +22,19 @@
     </main>
 
     <%- include('../partials/site-footer') %>
+
+    <script nonce="<%= cspNonce %>">
+      // Form dengan class 'js-confirm-submit' + data-confirm-message akan
+      // menampilkan window.confirm() dulu sebelum submit (dipakai di
+      // batalkan pesanan, tarik/tutup/batalkan event, hapus event, dsb).
+      // Pakai event delegation di document supaya berlaku untuk seluruh
+      // halaman tanpa perlu script terpisah di tiap view.
+      document.addEventListener('submit', function (e) {
+        var form = e.target.closest('.js-confirm-submit');
+        if (form && !window.confirm(form.dataset.confirmMessage || 'Yakin melanjutkan?')) {
+          e.preventDefault();
+        }
+      });
+    </script>
   </body>
 </html>

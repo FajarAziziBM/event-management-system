@@ -129,6 +129,16 @@ const config = {
     allowedOrigins: toList(process.env.CORS_ALLOWED_ORIGINS, ['http://localhost:3000']),
   },
 
+  /**
+   * SEC-03: hop count reverse proxy di depan app (nginx, load balancer, dst).
+   * 0 = tidak ada proxy, percaya req.socket.remoteAddress apa adanya (default,
+   * aman untuk local dev). Kalau di-deploy di belakang 1 reverse proxy, set
+   * TRUST_PROXY=1 supaya req.ip baca header X-Forwarded-For dgn benar —
+   * WAJIB diisi sesuai topologi asli, jangan asal 'true' (blind trust bikin
+   * X-Forwarded-For gampang dipalsukan untuk membypass rate limiting).
+   */
+  trustProxy: toInt(process.env.TRUST_PROXY, 0),
+
   order: {
     expiryMinutes: toInt(process.env.ORDER_EXPIRY_MINUTES, 60),
 
@@ -177,5 +187,34 @@ const config = {
     level: process.env.LOG_LEVEL || 'debug',
   },
 };
+
+/**
+ * SEC-08: cegah aplikasi jalan di production dengan secret yang masih nilai
+ * contoh dari .env.example, atau yang terlalu pendek untuk aman di-brute-force.
+ * Sengaja HANYA di production — di development/test, secret contoh yang
+ * pendek itu wajar & tidak boleh menghalangi orang baru clone & langsung coba.
+ */
+const WEAK_SECRET_PATTERNS = [/^replace_with/i, /^secret$/i, /^changeme$/i, /^12345/];
+const MIN_SECRET_LENGTH = 32;
+
+function assertStrongSecret(name, value) {
+  if (nodeEnv !== 'production') return;
+
+  if (
+    !value ||
+    value.length < MIN_SECRET_LENGTH ||
+    WEAK_SECRET_PATTERNS.some((re) => re.test(value))
+  ) {
+    throw new Error(
+      `${name} terlihat seperti nilai contoh/lemah (panjang < ${MIN_SECRET_LENGTH} karakter atau ` +
+        `masih placeholder). Generate nilai acak sungguhan sebelum deploy ke production, ` +
+        `contoh: \`openssl rand -hex 32\`.`,
+    );
+  }
+}
+
+assertStrongSecret('JWT_SECRET', config.auth.jwtSecret);
+assertStrongSecret('COOKIE_SECRET', config.auth.cookieSecret);
+assertStrongSecret('CSRF_SECRET', config.auth.csrfSecret);
 
 module.exports = config;

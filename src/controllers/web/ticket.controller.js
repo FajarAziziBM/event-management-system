@@ -18,7 +18,11 @@ const TicketWebController = {
   async print(req, res, next) {
     try {
       const ticket = await TicketService.getTicketById(req.params.id, req.user.id, req.user.role);
-      res.render('tickets/print', { title: `Cetak Tiket ${ticket.ticketCode}`, ticket, layout: false });
+      res.render('tickets/print', {
+        title: `Cetak Tiket ${ticket.ticketCode}`,
+        ticket,
+        layout: false,
+      });
     } catch (err) {
       next(err);
     }

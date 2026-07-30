@@ -17,31 +17,36 @@
   <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 mb-6 flex flex-wrap gap-3">
     <% if (event.status==='draft' ) { %>
     <form method="POST" action="/events/<%= event.id %>/publish">
+      <%- include('../partials/csrf-field') %>
       <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded-xl text-sm font-semibold hover:bg-green-700 transition-colors flex items-center gap-2">
         <i class="fas fa-bullhorn"></i> Publikasikan Event
       </button>
     </form>
     <% } else if (event.status==='published' ) { %>
-    <form method="POST" action="/events/<%= event.id %>/unpublish" onsubmit="return document.getElementById('target-draft').value='draft';">
-      <input type="hidden" name="targetStatus" id="target-draft" value="draft" />
+    <form method="POST" action="/events/<%= event.id %>/unpublish">
+      <%- include('../partials/csrf-field') %>
+      <input type="hidden" name="targetStatus" value="draft" />
       <button type="submit" class="bg-gray-100 text-gray-700 px-4 py-2 rounded-xl text-sm font-semibold hover:bg-gray-200 transition-colors flex items-center gap-2">
         <i class="fas fa-eye-slash"></i> Tarik ke Draft
       </button>
     </form>
     <form method="POST" action="/events/<%= event.id %>/unpublish">
+      <%- include('../partials/csrf-field') %>
       <input type="hidden" name="targetStatus" value="closed" />
       <button type="submit" class="bg-yellow-100 text-yellow-700 px-4 py-2 rounded-xl text-sm font-semibold hover:bg-yellow-200 transition-colors flex items-center gap-2">
         <i class="fas fa-lock"></i> Tutup Pendaftaran
       </button>
     </form>
-    <form method="POST" action="/events/<%= event.id %>/unpublish" onsubmit="return confirm('Yakin batalkan event ini? Seluruh pemegang tiket akan diberi notifikasi.');">
+    <form method="POST" action="/events/<%= event.id %>/unpublish" class="js-confirm-submit" data-confirm-message="Yakin batalkan event ini? Seluruh pemegang tiket akan diberi notifikasi.">
+      <%- include('../partials/csrf-field') %>
       <input type="hidden" name="targetStatus" value="cancelled" />
       <button type="submit" class="bg-red-50 text-red-700 px-4 py-2 rounded-xl text-sm font-semibold hover:bg-red-100 transition-colors flex items-center gap-2">
         <i class="fas fa-ban"></i> Batalkan Event
       </button>
     </form>
     <% } %>
-    <form method="POST" action="/events/<%= event.id %>/delete" onsubmit="return confirm('Hapus event ini secara permanen? Tindakan ini tidak bisa dibatalkan.');" class="ml-auto">
+    <form method="POST" action="/events/<%= event.id %>/delete" class="js-confirm-submit ml-auto" data-confirm-message="Hapus event ini secara permanen? Tindakan ini tidak bisa dibatalkan.">
+      <%- include('../partials/csrf-field') %>
       <button type="submit" class="text-red-600 px-4 py-2 rounded-xl text-sm font-semibold hover:bg-red-50 transition-colors flex items-center gap-2">
         <i class="fas fa-trash"></i> Hapus Event
       </button>
@@ -49,6 +54,7 @@
   </div>
 
   <form method="POST" action="/events/<%= event.id %>/edit" enctype="multipart/form-data" class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 md:p-8">
+    <%- include('../partials/csrf-field') %>
     <!-- Banner -->
     <div class="mb-8">
       <label class="block text-sm font-medium text-gray-700 mb-2">Banner Event</label>

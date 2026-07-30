@@ -14,6 +14,7 @@
       <p class="text-gray-500 text-sm mb-6">Senang bertemu lagi! Masukkan detail akun Anda.</p>
 
       <form method="POST" action="/auth/login" class="space-y-4">
+        <%- include('../partials/csrf-field') %>
         <% if (typeof redirect !=='undefined' && redirect) { %>
         <input type="hidden" name="redirect" value="<%= redirect %>" />
         <% } %>
