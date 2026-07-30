@@ -97,7 +97,10 @@ textarea:focus-visible {
   opacity: 0;
   visibility: hidden;
   transform: translateY(4px);
-  transition: opacity 0.15s ease, transform 0.15s ease, visibility 0.15s;
+  transition:
+    opacity 0.15s ease,
+    transform 0.15s ease,
+    visibility 0.15s;
 }
 .group:hover .dropdown-menu,
 .dropdown-menu.is-open {
