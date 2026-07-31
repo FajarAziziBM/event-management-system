@@ -67,11 +67,9 @@ app.use((req, res, next) => {
 
   // Helper format Rupiah & tanggal Indonesia — dipakai di banyak view (events, orders, tickets)
   res.locals.formatCurrency = (amount) =>
-    new Intl.NumberFormat('id-ID', {
-      style: 'currency',
-      currency: 'IDR',
-      maximumFractionDigits: 0,
-    }).format(Number(amount) || 0);
+    new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(
+      Number(amount) || 0,
+    );
   res.locals.formatDate = (date) =>
     date
       ? new Intl.DateTimeFormat('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }).format(

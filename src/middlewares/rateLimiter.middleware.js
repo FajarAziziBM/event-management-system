@@ -31,12 +31,8 @@ const generalApiLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   handler: (req, res) => {
-    logger.warn(
-      `[rate-limit:api] IP ${req.ip} melebihi batas pada ${req.method} ${req.originalUrl}`,
-    );
-    res
-      .status(429)
-      .json(ApiResponse.error('Terlalu banyak permintaan, coba lagi beberapa saat lagi.'));
+    logger.warn(`[rate-limit:api] IP ${req.ip} melebihi batas pada ${req.method} ${req.originalUrl}`);
+    res.status(429).json(ApiResponse.error('Terlalu banyak permintaan, coba lagi beberapa saat lagi.'));
   },
 });
 
@@ -57,9 +53,7 @@ const authLimiter = rateLimit({
   legacyHeaders: false,
   skipSuccessfulRequests: true,
   handler: (req, res) => {
-    logger.warn(
-      `[rate-limit:auth] IP ${req.ip} melebihi batas pada ${req.method} ${req.originalUrl}`,
-    );
+    logger.warn(`[rate-limit:auth] IP ${req.ip} melebihi batas pada ${req.method} ${req.originalUrl}`);
     const message = 'Terlalu banyak percobaan. Silakan coba lagi dalam 15 menit.';
     if (req.originalUrl.startsWith('/api/')) {
       return res.status(429).json(ApiResponse.error(message));
@@ -83,9 +77,7 @@ const webhookLimiter = rateLimit({
   legacyHeaders: false,
   handler: (req, res) => {
     logger.warn(`[rate-limit:webhook] IP ${req.ip} melebihi batas webhook`);
-    res
-      .status(429)
-      .json(ApiResponse.error('Terlalu banyak permintaan webhook, coba lagi sesaat lagi.'));
+    res.status(429).json(ApiResponse.error('Terlalu banyak permintaan webhook, coba lagi sesaat lagi.'));
   },
 });
 
