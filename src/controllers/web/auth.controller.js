@@ -175,10 +175,7 @@ class AuthWebController {
       const name = (req.body.name || '').trim();
       const phone = (req.body.phone || '').trim();
 
-      await AuthService.updateProfile(req.user.id, {
-        name: name || undefined,
-        phone: phone || null,
-      });
+      await AuthService.updateProfile(req.user.id, { name: name || undefined, phone: phone || null });
       setFlash(res, 'success', 'Profil berhasil diperbarui.');
       return res.redirect('/auth/profile');
     } catch (err) {

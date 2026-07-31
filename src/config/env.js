@@ -200,11 +200,7 @@ const MIN_SECRET_LENGTH = 32;
 function assertStrongSecret(name, value) {
   if (nodeEnv !== 'production') return;
 
-  if (
-    !value ||
-    value.length < MIN_SECRET_LENGTH ||
-    WEAK_SECRET_PATTERNS.some((re) => re.test(value))
-  ) {
+  if (!value || value.length < MIN_SECRET_LENGTH || WEAK_SECRET_PATTERNS.some((re) => re.test(value))) {
     throw new Error(
       `${name} terlihat seperti nilai contoh/lemah (panjang < ${MIN_SECRET_LENGTH} karakter atau ` +
         `masih placeholder). Generate nilai acak sungguhan sebelum deploy ke production, ` +

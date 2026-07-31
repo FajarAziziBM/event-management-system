@@ -106,7 +106,8 @@ const EventWebController = {
     try {
       const event = await EventService.getEventBySlug(req.params.slug, req.user);
       const isOwner =
-        req.user && (req.user.role === 'admin' || String(event.creatorId) === String(req.user.id));
+        req.user &&
+        (req.user.role === 'admin' || String(event.creatorId) === String(req.user.id));
 
       res.render('events/detail', {
         title: event.title,
@@ -171,11 +172,7 @@ const EventWebController = {
       }
 
       const event = await EventService.createEvent(req.user.id, data);
-      setFlash(
-        res,
-        'success',
-        'Event berhasil dibuat sebagai draft. Yuk lengkapi banner-nya di bawah, lalu publikasikan kalau sudah siap.',
-      );
+      setFlash(res, 'success', 'Event berhasil dibuat sebagai draft. Yuk lengkapi banner-nya di bawah, lalu publikasikan kalau sudah siap.');
       return res.redirect(`/events/${event.id}/edit`);
     } catch (err) {
       try {
@@ -269,7 +266,7 @@ const EventWebController = {
   },
 
   /** POST /events/:id/publish */
-  async publish(req, res, next) {
+  async publish(req, res, _next) {
     try {
       await EventService.publishEvent(req.params.id, req.user.id, req.user.role);
       setFlash(res, 'success', 'Event berhasil dipublikasikan dan sekarang terlihat oleh publik.');
@@ -280,7 +277,7 @@ const EventWebController = {
   },
 
   /** POST /events/:id/unpublish — targetStatus: draft | closed | cancelled (divalidasi di routes) */
-  async unpublish(req, res, next) {
+  async unpublish(req, res, _next) {
     try {
       const targetStatus = req.body.targetStatus || 'draft';
       await EventService.unpublishEvent(req.params.id, req.user.id, req.user.role, targetStatus);
@@ -297,7 +294,7 @@ const EventWebController = {
   },
 
   /** POST /events/:id/delete */
-  async remove(req, res, next) {
+  async remove(req, res, _next) {
     try {
       await EventService.deleteEvent(req.params.id, req.user.id, req.user.role);
       setFlash(res, 'success', 'Event berhasil dihapus.');

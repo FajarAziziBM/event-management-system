@@ -17,10 +17,7 @@ const OrderWebController = {
   async checkoutForm(req, res, next) {
     try {
       const event = await EventService.getEventBySlug(req.params.slug, req.user);
-      const quantity = Math.min(
-        Math.max(parseInt(req.query.qty, 10) || 1, 1),
-        event.availableTicket || 1,
-      );
+      const quantity = Math.min(Math.max(parseInt(req.query.qty, 10) || 1, 1), event.availableTicket || 1);
 
       if (event.status !== 'published') {
         setFlash(res, 'error', 'Event ini sedang tidak menerima pemesanan.');
@@ -96,11 +93,9 @@ const OrderWebController = {
       const order = await OrderService.getOrderById(req.params.id, req.user.id, req.user.role);
       let paymentUrl = null;
       if (order.paymentStatus === 'pending') {
-        const result = await PaymentService.getPaymentUrl(
-          order.id,
-          req.user.id,
-          req.user.role,
-        ).catch(() => null);
+        const result = await PaymentService.getPaymentUrl(order.id, req.user.id, req.user.role).catch(
+          () => null,
+        );
         paymentUrl = result ? result.paymentUrl : null;
       }
       res.render('orders/detail', { title: `Pesanan ${order.orderNumber}`, order, paymentUrl });
@@ -112,11 +107,7 @@ const OrderWebController = {
   /** GET /orders/:id/status — JSON ringan untuk polling status pembayaran */
   async statusJson(req, res, next) {
     try {
-      const status = await PaymentService.getPaymentStatus(
-        req.params.id,
-        req.user.id,
-        req.user.role,
-      );
+      const status = await PaymentService.getPaymentStatus(req.params.id, req.user.id, req.user.role);
       res.json(status);
     } catch (err) {
       next(err);
@@ -124,7 +115,7 @@ const OrderWebController = {
   },
 
   /** POST /orders/:id/cancel */
-  async cancel(req, res, next) {
+  async cancel(req, res, _next) {
     try {
       await OrderService.cancelOrder(req.params.id, req.user.id, req.user.role);
       setFlash(res, 'success', 'Pesanan berhasil dibatalkan.');
