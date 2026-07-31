@@ -31,13 +31,7 @@ router.get('/profile', requireWebAuth, AuthWebController.getProfile);
 // juga dipasang di routes/api/v1/auth.js, supaya percobaan di web & API
 // terhitung dalam jatah yang sama per-IP.
 // SEC-06: requireCsrf di SETIAP form POST web (tidak berlaku utk /api/v1/*).
-router.post(
-  '/register',
-  authLimiter,
-  requireCsrf,
-  validateRegister,
-  AuthWebController.postRegister,
-);
+router.post('/register', authLimiter, requireCsrf, validateRegister, AuthWebController.postRegister);
 router.post('/login', authLimiter, requireCsrf, validateLogin, AuthWebController.postLogin);
 router.post('/logout', requireCsrf, AuthWebController.logout);
 router.post(

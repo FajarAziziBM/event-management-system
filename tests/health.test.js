@@ -3,6 +3,11 @@
 
 const request = require('supertest');
 const app = require('../src/app');
+const db = require('../src/models');
+
+afterAll(async () => {
+  await db.sequelize.close();
+});
 
 describe('GET /api/v1/health', () => {
   it('mengembalikan status 200 dan envelope sukses', async () => {
