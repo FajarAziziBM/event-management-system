@@ -1,0 +1,74 @@
+# docker-compose.yml — CICD-01
+#
+# Pemakaian:
+#   cp .env.example .env      # WAJIB, app tidak mau start tanpa JWT_SECRET dkk
+#   docker compose up -d mysql
+#   docker compose run --rm migrate                       # migration sekali jalan
+#   docker compose run --rm migrate npx sequelize-cli db:seed:all   # opsional, data contoh
+#   docker compose up -d app
+#
+# Catatan: file ini untuk LOCAL DEV / demo satu-instance. Untuk production,
+# migration dijalankan sebagai langkah eksplisit di pipeline deploy (CICD-03),
+# bukan otomatis tiap container start — lihat docs/DEPLOYMENT.md.
+
+services:
+  mysql:
+    image: mysql:8.0
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-rootpass_ganti_ini}
+      MYSQL_DATABASE: ${DB_NAME:-ems_db}
+      MYSQL_USER: ${DB_USER:-ems_user}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-ems_pass}
+    ports:
+      # Cuma untuk kenyamanan dev (connect via GUI client/mysql CLI dari host).
+      # Aman dihapus kalau tidak perlu akses dari luar container.
+      - '127.0.0.1:3306:3306'
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ['CMD', 'mysqladmin', 'ping', '-h', 'localhost', '-uroot', '-p${DB_ROOT_PASSWORD:-rootpass_ganti_ini}']
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+
+  # One-off job: `docker compose run --rm migrate` lalu keluar (bukan service
+  # yang terus hidup). Reuse image yang sama utk seed: tambahkan override
+  # command, contoh di komentar atas.
+  migrate:
+    build:
+      context: .
+      target: migrator
+    env_file:
+      - .env
+    environment:
+      DB_HOST: mysql
+      DB_PORT: 3306
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  app:
+    build:
+      context: .
+      target: runtime
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      DB_HOST: mysql
+      DB_PORT: 3306
+    ports:
+      - '${PORT:-3000}:3000'
+    volumes:
+      - uploads_data:/app/src/public/uploads
+      - app_logs:/app/logs
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+volumes:
+  mysql_data:
+  uploads_data:
+  app_logs:
