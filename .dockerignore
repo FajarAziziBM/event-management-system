@@ -1,0 +1,35 @@
+# .dockerignore — CICD-01
+node_modules
+npm-debug.log*
+
+# Env & secrets — JANGAN pernah ikut ke image, dipasok lewat env_file/--env-file
+.env
+.env.*
+!.env.example
+
+logs
+*.log
+coverage
+.nyc_output
+
+# Bukan bagian dari image produksi
+tests
+docs
+.git
+.github
+.husky
+.vscode
+.idea
+
+# Dokumentasi/markdown di root
+*.md
+
+# File upload user (kalau ada sisa dari dev lokal)
+src/public/uploads/events/banners/*
+src/public/uploads/events/attachments/*
+!src/public/uploads/events/banners/.gitkeep
+!src/public/uploads/events/attachments/.gitkeep
+
+.dockerignore
+Dockerfile*
+docker-compose*.yml
