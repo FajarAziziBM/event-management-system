@@ -26,6 +26,13 @@
     "db:migrate:undo:all": "sequelize-cli db:migrate:undo:all",
     "db:seed": "sequelize-cli db:seed:all",
     "db:seed:undo": "sequelize-cli db:seed:undo:all",
+    "docker:up": "docker compose up -d mysql && docker compose run --rm migrate && docker compose up -d app",
+    "docker:down": "docker compose down",
+    "docker:logs": "docker compose logs -f app",
+    "pm2:start": "pm2 start ecosystem.config.js --env production",
+    "pm2:reload": "pm2 reload ecosystem.config.js --env production",
+    "pm2:logs": "pm2 logs ems-api",
+    "backup:db": "bash scripts/db-backup.sh",
     "prepare": "husky"
   },
   "keywords": [
@@ -41,6 +48,7 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "@sentry/node": "^10.69.0",
     "bcrypt": "^6.0.0",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.6",

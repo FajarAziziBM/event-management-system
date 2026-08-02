@@ -94,6 +94,14 @@ app.use(flashMiddleware);
 // --- Routes ---
 app.use(routes);
 
+// CICD-07: Sentry HARUS ditempel SETELAH seluruh route, SEBELUM error handler
+// milik app sendiri — supaya Sentry sempat menangkap detail error dulu,
+// lalu tetap diteruskan ke errorHandler kita utk membentuk respons yg dilihat
+// user. Tidak melakukan apa pun kalau SENTRY_DSN kosong (lihat src/instrument.js).
+if (config.monitoring.sentryDsn) {
+  require('@sentry/node').setupExpressErrorHandler(app);
+}
+
 // --- 404 & global error handler (SETUP-07) — HARUS paling akhir ---
 app.use(notFoundHandler);
 app.use(errorHandler);

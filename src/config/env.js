@@ -186,6 +186,17 @@ const config = {
   log: {
     level: process.env.LOG_LEVEL || 'debug',
   },
+
+  /**
+   * CICD-07: error tracking (Sentry) — SEPENUHNYA opsional. Kosongkan
+   * SENTRY_DSN utk menonaktifkan total (default) — lihat src/instrument.js.
+   * tracesSampleRate rendah by default: performance tracing Sentry dihitung
+   * per-transaksi di sebagian besar paket harga, sengaja konservatif.
+   */
+  monitoring: {
+    sentryDsn: process.env.SENTRY_DSN || null,
+    sentryTracesSampleRate: toInt(process.env.SENTRY_TRACES_SAMPLE_RATE_PERCENT, 0) / 100,
+  },
 };
 
 /**
